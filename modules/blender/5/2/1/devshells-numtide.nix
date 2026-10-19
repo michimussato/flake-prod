@@ -141,12 +141,6 @@
         '';
         # devshell.startup.fhs.text = ''
         # '';
-        shellHook = ''
-          # set -a;
-          # export FOO="bar";
-          # set +a;
-          alias blender="blender $DEFAULT_ARGS"
-        '';
         # Custom Env:
         env = [
           {
