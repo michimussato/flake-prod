@@ -97,9 +97,6 @@
 
         # tarkgetPkgs expects a function
         targetPkgs = pkgs: (pkgs-deps-blender-4-4-3);
-        # targetPkgs = pkgs: (pkgs-deps-blender-4-4-3 ++ lib.makeLibraryPath [
-        #   pkgs.wayland
-        # ]);
       };
 
       pkgs-dev-4-4-3 = (with pkgs; [
@@ -110,11 +107,6 @@
           targetPkgs = pkgs: (pkgs-deps-blender-4-4-3);
         })
       ]);
-
-      # pkgs-dev-4-4-3 = (with pkgs; [
-      #   # fhs shell
-      #   (fhs-blender-4-4-3)
-      # ]);
 
       # # This is the launch script for Blender 4.4.3
       # maybe we could use `/run/current-system/sw/bin/xdg-terminal "command"`
@@ -162,16 +154,6 @@
     # https://hugosum.com/blog/recreating-development-environment-with-nix-flake
     devshells = {
       blender-4-4-3-devshell = {
-#        packages = self.packages.blender-4-4-3-package.targetPkgs;
-#        packages = pkgs.mkShell {
-#          nativeBuildInputs = [pkgs-dev-4-4-3];
-#          shellHook = ''
-#            # set -a;
-#            # export FOO="bar";
-#            # set +a;
-#            alias blender="blender $DEFAULT_ARGS"
-#          '';
-#        };
         packages = pkgs-dev-4-4-3;
         name = "blender-4-4-3-devshell";
         motd = ''

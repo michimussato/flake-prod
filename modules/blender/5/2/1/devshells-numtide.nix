@@ -8,12 +8,16 @@
   imports = [ inputs.devshell.flakeModule ];
 
   perSystem =
-    { pkgs, ... }:
+    { pkgs, lib, ... }:
 
     let
       # Base Deps
       # For all Blenders?
       pkgs-base = with pkgs; [
+        # kitty
+        kitty
+        alacritty
+
         udev
         alsa-lib
         libX11
@@ -25,6 +29,7 @@
         libICE
         libGL
         wayland
+        egl-wayland
       ];
 
       # Blender 5.2.1
@@ -55,16 +60,29 @@
         libc
       ] ++ pkgs-base;
 
+      profile = ''
+        export PATH=${path}:$PATH
+
+        # don't remember what this was for:
+        # (does not seem to have an effect on the env anyway)
+        # an alternative could be to use lib.makeLibraryPath
+        # - https://noogle.dev/f/lib/makeLibraryPath/
+        export LD_LIBRARY_PATH=${pkgs.lib.makeLibraryPath [
+          pkgs.wayland
+        ]}:$LD_LIBRARY_PATH
+
+        # export QT_QPA_PLATFORM=xcb
+        export AYON_BLENDER_USE_SYSTEM_PATH=1
+
+        # No effect; still uses xterm:
+        # export TERM=linux
+
+        export DEFAULT_ARGS="${builtins.toString blender-default-args}"
+      '';
+
       fhs-blender-5-2-1 = pkgs.buildFHSEnv {
         name = "blender-5-2-1-package";
-        profile = ''
-          export PATH=s:$PATH
-          export LD_LIBRARY_PATH=${pkgs.wayland}/lib:$LD_LIBRARY_PATH
-          # export QT_QPA_PLATFORM=xcb
-          export AYON_BLENDER_USE_SYSTEM_PATH=1
-          # No effect; still uses xterm:
-          # export TERM=linux
-        '';
+        inherit profile;
 
         runScript = pkgs.lib.getExe runScript-5-2-1;
 
@@ -82,6 +100,7 @@
       ]);
 
       # # This is the launch script for Blender 5.2.1
+      # maybe we could use `/run/current-system/sw/bin/xdg-terminal "command"`
       runScript-5-2-1 = pkgs.writeScriptBin "blender-5-2-1-bin" ''
         echo "Running ${pkgs.lib.getBin (pkgs.glibc)}/bin/ldd $(which blender)..." \
           && ${pkgs.lib.getBin (pkgs.glibc)}/bin/ldd $(which blender) \
@@ -94,6 +113,9 @@
 
     blender-default-args = [
       "--python-use-system-env"
+      "--enable-autoexec"
+      "--verbose" # expects a verbosity level
+      "4"  # fatal, error, warning, info, debug, and trace
       "--debug"
       "--debug-cycles"
       "--debug-ffmpeg"
@@ -105,17 +127,7 @@
     # https://determinate.systems/blog/nix-run/
     # A simple executable package
     packages = {
-
       blender-5-2-1-package = fhs-blender-5-2-1;
-
-#       blender-4-4-3-testblender-5-2-1 = pkgs.writeScriptBin "blender-5-2-3-bin" ''
-#        echo "Running ${pkgs.lib.getBin (pkgs.glibc)}/bin/ldd $(which blender)..."
-#        ${pkgs.lib.getBin (pkgs.glibc)}/bin/ldd $(which blender)
-#
-#        echo "Launching $(which blender) with extra args $@..."
-#        blender --python-use-system-env --debug --debug-cycles --debug-ffmpeg $@
-#      '';
-
     };
 
     # https://discourse.nixos.org/t/flakes-way-of-creating-a-fhs-environment/20821
@@ -130,6 +142,7 @@
       };
     };
 
+    # https://hugosum.com/blog/recreating-development-environment-with-nix-flake
     devshells = {
       blender-5-2-1-devshell = {
         packages = pkgs-dev-5-2-1;
@@ -137,25 +150,59 @@
         motd = ''
           You are now in a Blender 5.2.1 configured environment.
           Call "fhs" to setup File Hierarchy Standard.
-          DEFAULT_ARGS = "${builtins.toString blender-default-args}"
+
+          DEFAULT_ARGS = "$DEFAULT_ARGS"
+
+          Available commands:
+          $(find ${path} -maxdepth 1 -type f -executable)
         '';
-        # devshell.startup.fhs.text = ''
-        # '';
+        devshell.startup.fhs.text = ''
+          # `inherit profile;` does not work for devshells.
+          # so seems to be the only option to get the
+          # same env in the devshell
+          ${profile}
+
+          # aliases are not exported to subshells
+          # hence, use functions
+          #
+          # automatically export all functions declared here:
+          set -a
+
+          blenderhelp() {
+            set -x;
+            command blender $DEFAULT_ARGS --background --help;
+            set +x;
+          }
+
+          blender() {
+            set -x;
+            command blender $DEFAULT_ARGS "$@";
+            set +x;
+          }
+
+          blenderpy() {
+            set -x;
+            command blender $DEFAULT_ARGS --background --python-console "$@";
+            set +x;
+          }
+
+          set +a
+        '';
         # Custom Env:
-        env = [
-          {
-            name = "DEV_SHELL";
-            value = "blender-5-2-1";
-          }
-          {
-            name = "PATH";
-            prefix = path;
-          }
-          {
-            name = "DEFAULT_ARGS";
-            value = "${builtins.toString blender-default-args}";
-          }
-        ];
+        # env = [
+        #   {
+        #     name = "DEV_SHELL";
+        #     value = "blender-5-2-1";
+        #   }
+        #   # {
+        #   #   name = "PATH";
+        #   #   prefix = path;
+        #   # }
+        #   # {
+        #   #   name = "DEFAULT_ARGS";
+        #   #   value = "${builtins.toString blender-default-args}";
+        #   # }
+        # ];
       };
     };
   };
