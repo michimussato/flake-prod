@@ -14,10 +14,6 @@
       # Base Deps
       # For all Blenders?
       pkgs-base = with pkgs; [
-        # kitty
-        kitty
-        alacritty
-
         udev
         alsa-lib
         libX11
