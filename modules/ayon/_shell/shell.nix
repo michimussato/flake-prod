@@ -4,7 +4,7 @@
 
 # https://ryantm.github.io/nixpkgs/build-helpers/special/fhs-environments/
 (pkgs.buildFHSEnv {
-  name = "simple-x11-env";
+  name = "simple-x11-env-for-ayon";
   targetPkgs =
     pkgs:
     (with pkgs; [

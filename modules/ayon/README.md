@@ -21,3 +21,16 @@ ldd --verbose /home/nixos/Downloads/Nuke/Nuke15.2v9/Nuke15.2 > ldd__${NUKE}.txt
 - https://discourse.nixos.org/t/where-can-i-get-libgthread-2-0-so-0/16937/7
 
 https://github.com/hellonomonom/NukeLicenseServerSetup
+
+---
+
+# Ayon Shell
+
+Todo:
+ - [ ] Do we need `AYON-1.6.3-linux-rocky9/ayon` locally?
+ - [ ] Can we centralize it to NFS/SSHFS?
+ - [ ] Should we create a Flake instead?
+
+```shell
+nix-shell modules/ayon/_shell/
+```
