@@ -134,13 +134,13 @@
       # # This is the launch script for Blender 4.4.3
       # maybe we could use `/run/current-system/sw/bin/xdg-terminal "command"`
       runScript-houdini-20-0-896 = pkgs.writeScriptBin "houdini-20-0-896-bin" ''
-        echo "Running ${pkgs.lib.getBin (pkgs.glibc)}/bin/ldd $(which houdini)..." \
-          && ${pkgs.lib.getBin (pkgs.glibc)}/bin/ldd $(which houdini) \
-          && echo "Launching $(which houdini)" \
+        echo "Running ${pkgs.lib.getBin (pkgs.glibc)}/bin/ldd $(which houdini-bin)..." \
+          && ${pkgs.lib.getBin (pkgs.glibc)}/bin/ldd $(which houdini-bin) \
+          && echo "Launching $(which houdini-bin)" \
           && echo "- with default args \"${builtins.toString houdini-default-args}\"" \
           && echo "- with extra args \"$@\"" \
           && echo "..." \
-          && houdini ${builtins.toString houdini-default-args} $@
+          && houdini-bin ${builtins.toString houdini-default-args} $@
       '';
 
     houdini-default-args = [
