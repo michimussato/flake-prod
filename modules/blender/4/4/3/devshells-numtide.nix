@@ -82,7 +82,7 @@
         # bash: /data/share/tools/blender-4.4.3-linux-x64/blender: Permission denied
         inherit profile;
 
-        runScript = pkgs.lib.getExe runScript-4-4-3;
+        runScript = pkgs.lib.getExe runScript-blender-4-4-3;
 
         # it seems like nix is `exec`ing:
         # runScript = "(${pkgs.lib.getExe runScript-4-4-3})";
@@ -95,7 +95,7 @@
         targetPkgs = pkgs: (pkgs-deps-blender-4-4-3);
       };
 
-      pkgs-dev-4-4-3 = (with pkgs; [
+      pkgs-dev-blender-4-4-3 = (with pkgs; [
         # fhs shell
         (pkgs.buildFHSEnv {
           name = "fhs";
@@ -106,7 +106,7 @@
 
       # # This is the launch script for Blender 4.4.3
       # maybe we could use `/run/current-system/sw/bin/xdg-terminal "command"`
-      runScript-4-4-3 = pkgs.writeScriptBin "blender-4-4-3-bin" ''
+      runScript-blender-4-4-3 = pkgs.writeScriptBin "blender-4-4-3-bin" ''
         echo "Running ${pkgs.lib.getBin (pkgs.glibc)}/bin/ldd $(which blender)..." \
           && ${pkgs.lib.getBin (pkgs.glibc)}/bin/ldd $(which blender) \
           && echo "Launching $(which blender)" \
@@ -150,7 +150,7 @@
     # https://hugosum.com/blog/recreating-development-environment-with-nix-flake
     devshells = {
       blender-4-4-3-devshell = {
-        packages = pkgs-dev-4-4-3;
+        packages = pkgs-dev-blender-4-4-3;
         name = "blender-4-4-3-devshell";
         motd = ''
           You are now in a Blender 4.4.3 configured environment.
@@ -159,7 +159,7 @@
           DEFAULT_ARGS = "$DEFAULT_ARGS"
 
           Available commands:
-          $(find ${path} -maxdepth 1 -type f -executable)
+          $(find ${path} -maxdepth 1 -type f -executable | sort)
         '';
         devshell.startup.fhs.text = ''
           # `inherit profile;` does not work for devshells.
