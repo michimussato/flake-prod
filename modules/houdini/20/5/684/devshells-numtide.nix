@@ -232,12 +232,12 @@
           set +a
         '';
         # Custom Env:
-        env = [
-          {
-            name = "DEV_SHELL";
-            value = "houdini-base";
-          }
-        ];
+        # env = [
+        #   {
+        #     name = "DEV_SHELL";
+        #     value = "houdini-base";
+        #   }
+        # ];
 #            extraBwrapArgs = [
 #              "--ro-bind-try /run/opengl-driver/etc/OpenCL/vendors /etc/OpenCL/vendors" # this is the case of NixOS
 #              "--ro-bind-try /etc/OpenCL/vendors /etc/OpenCL/vendors" # this is the case of not NixOS

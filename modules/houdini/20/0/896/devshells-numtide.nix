@@ -145,17 +145,17 @@
           && houdini-bin ${builtins.toString houdini-default-args} $@
       '';
 
-    houdini-default-args = [
-      # "--python-use-system-env"
-      # "--enable-autoexec"
-      # "--verbose" # expects a verbosity level
-      # "4"  # fatal, error, warning, info, debug, and trace
-      # "--debug"
-      # "--debug-cycles"
-      # "--debug-ffmpeg"
-    ];
+      houdini-default-args = [
+        # "--python-use-system-env"
+        # "--enable-autoexec"
+        # "--verbose" # expects a verbosity level
+        # "4"  # fatal, error, warning, info, debug, and trace
+        # "--debug"
+        # "--debug-cycles"
+        # "--debug-ffmpeg"
+      ];
 
-  in
+    in
 
   {
     # https://determinate.systems/blog/nix-run/
@@ -232,12 +232,12 @@
           set +a
         '';
         # Custom Env:
-        env = [
-          {
-            name = "DEV_SHELL";
-            value = "houdini-base";
-          }
-        ];
+        # env = [
+        #   {
+        #     name = "DEV_SHELL";
+        #     value = "houdini-${version-dashed}";
+        #   }
+        # ];
 #            extraBwrapArgs = [
 #              "--ro-bind-try /run/opengl-driver/etc/OpenCL/vendors /etc/OpenCL/vendors" # this is the case of NixOS
 #              "--ro-bind-try /etc/OpenCL/vendors /etc/OpenCL/vendors" # this is the case of not NixOS
