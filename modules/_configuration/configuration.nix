@@ -72,8 +72,8 @@
 #        sshfs
 #        jq
 #        bat
-        kitty
-        alacritty
+#        kitty
+#        alacritty
         # Adding djv from packageOverride in here
         # - [x] works
         # djv
