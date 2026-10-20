@@ -40,7 +40,7 @@
 
           Some example commands:
           - nix develop github:michimussato/flake-prod#blender-4-4-3-devshell
-          - alacritty --command nix run github:michimussato/flake-prod#blender-4-4-3-app
+          - alacritty --hold --title "blender-4-4-3" --command nix run github:michimussato/flake-prod#blender-4-4-3-app
         '';
         devshell.startup.prod-term-profile.text = ''
           # `inherit profile;` does not work for devshells.
