@@ -69,10 +69,12 @@
       ];
 
       # Houdini 20.0.896
-      houdini-setup-base = "/data/share/tools/houdini-20.0.896-linux_x86_64_gcc11.2";
+      version = "20.0.896";
+      version-dashed = builtins.replaceStrings ["."] ["-"] version;
+      houdini-setup-base = "/data/share/tools/houdini-${version}-linux_x86_64_gcc11.2";
       path = "${houdini-setup-base}/bin";
       # # Deps
-      pkgs-deps-houdini-20-0-896 = with pkgs; [
+      pkgs-deps-houdini = with pkgs; [
       ] ++ pkgs-base;
 
       profile = ''
@@ -97,13 +99,13 @@
         export SESI_LMHOST="http://miniboss.meemoo.lan:1715"
       '';
 
-      fhs-houdini-20-0-896 = pkgs.buildFHSEnv {
-        name = "houdini-20-0-896-package";
+      fhs-houdini = pkgs.buildFHSEnv {
+        name = "houdini-${version-dashed}-package";
         # /data/share/tools/blender-4.4.3-linux-x64/blender
         # bash: /data/share/tools/blender-4.4.3-linux-x64/blender: Permission denied
         inherit profile;
 
-        runScript = pkgs.lib.getExe runScript-houdini-20-0-896;
+        runScript = pkgs.lib.getExe runScript-houdini;
 
         # it seems like nix is `exec`ing:
         # runScript = "(${pkgs.lib.getExe runScript-4-4-3})";
@@ -113,7 +115,7 @@
         # nix run /home/michael/git/repos/my-test-flake-01#blender-4-4-3
 
         # tarkgetPkgs expects a function
-        targetPkgs = pkgs: (pkgs-deps-houdini-20-0-896);
+        targetPkgs = pkgs: (pkgs-deps-houdini);
 
         # houdini spawns hserver (and other license tools) that is supposed to live beyond the lifespan of houdini process
         dieWithParent = false;
@@ -122,20 +124,20 @@
         unsharePid = false;
       };
 
-      pkgs-dev-houdini-20-0-896 = (with pkgs; [
+      pkgs-dev-houdini = (with pkgs; [
         # fhs shell
         (pkgs.buildFHSEnv {
           name = "fhs";
           runScript = "bash";
-          targetPkgs = pkgs: (pkgs-deps-houdini-20-0-896);
+          targetPkgs = pkgs: (pkgs-deps-houdini);
         })
       ]);
 
       # # This is the launch script for Blender 4.4.3
       # maybe we could use `/run/current-system/sw/bin/xdg-terminal "command"`
-      runScript-houdini-20-0-896 = pkgs.writeScriptBin "houdini-20-0-896-bin" ''
+      runScript-houdini = pkgs.writeScriptBin "houdini-${version-dashed}-bin" ''
         echo "Running ${pkgs.lib.getBin (pkgs.glibc)}/bin/ldd $(which houdini-bin)..." \
-          && ${pkgs.lib.getBin (pkgs.glibc)}/bin/ldd $(which houdini-bin) \
+          && ${pkgs.lib.getBin (pkgs.glibc)}/bin/ldd $(which houdini-bin) | sort --ignore-leading-blanks --ignore-case | grep -E --color "\b(not found)\b|$" \
           && echo "Launching $(which houdini-bin)" \
           && echo "- with default args \"${builtins.toString houdini-default-args}\"" \
           && echo "- with extra args \"$@\"" \
@@ -159,7 +161,7 @@
     # https://determinate.systems/blog/nix-run/
     # A simple executable package
     packages = {
-      houdini-20-0-896-package = fhs-houdini-20-0-896;
+      "houdini-${version-dashed}-package" = fhs-houdini;
     };
 
     # https://discourse.nixos.org/t/flakes-way-of-creating-a-fhs-environment/20821
@@ -167,20 +169,20 @@
     # https://nix.dev/manual/nix/2.34/command-ref/new-cli/nix3-run.html#apps
     # https://vtimofeenko.com/posts/practical-nix-flake-anatomy-a-guided-tour-of-flake.nix/#apps}
     apps = {
-      houdini-20-0-896-app = {
+      "houdini-${version-dashed}-app" = {
         type = "app";
-        program = self.packages.x86_64-linux.houdini-20-0-896-package;
-        meta.description = "Launch Houdini 20.0.896";
+        program = self.packages.x86_64-linux."houdini-${version-dashed}-package";
+        meta.description = "Launch Houdini ${version}";
       };
     };
 
     # https://hugosum.com/blog/recreating-development-environment-with-nix-flake
     devshells = {
-      houdini-20-0-896-devshell = {
-        packages = pkgs-dev-houdini-20-0-896;
-        name = "houdini-20-0-896-devshell";
+      "houdini-${version-dashed}-devshell" = {
+        packages = pkgs-dev-houdini;
+        name = "houdini-${version-dashed}-devshell";
         motd = ''
-          You are now in a Houdini 20.0.896 configured environment.
+          You are now in a Houdini ${version} configured environment.
           Call "fhs" to setup File Hierarchy Standard.
 
           DEFAULT_ARGS = "$DEFAULT_ARGS"

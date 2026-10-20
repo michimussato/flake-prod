@@ -33,9 +33,11 @@
       ];
 
       # Blender 5.2.1
-      path = "/data/share/tools/blender-5.2.1-linux-x64";
+      version = "5.2.1";
+      version-dashed = builtins.replaceStrings ["."] ["-"] version;
+      path = "/data/share/tools/blender-${version}-linux-x64";
       # # Deps
-      pkgs-deps-blender-5-2-1 = with pkgs; [
+      pkgs-deps-blender = with pkgs; [
         libxxf86vm
         libdecor
 
@@ -80,30 +82,30 @@
         export DEFAULT_ARGS="${builtins.toString blender-default-args}"
       '';
 
-      fhs-blender-5-2-1 = pkgs.buildFHSEnv {
-        name = "blender-5-2-1-package";
+      fhs-blender = pkgs.buildFHSEnv {
+        name = "blender-${version-dashed}-package";
         inherit profile;
 
-        runScript = pkgs.lib.getExe runScript-5-2-1;
+        runScript = pkgs.lib.getExe runScript;
 
         # tarkgetPkgs expects a function
-        targetPkgs = pkgs: (pkgs-deps-blender-5-2-1);
+        targetPkgs = pkgs: (pkgs-deps-blender);
       };
 
-      pkgs-dev-5-2-1 = (with pkgs; [
+      pkgs-dev-blender = (with pkgs; [
         # fhs shell
         (pkgs.buildFHSEnv {
           name = "fhs";
           runScript = "bash";
-          targetPkgs = pkgs: (pkgs-deps-blender-5-2-1);
+          targetPkgs = pkgs: (pkgs-deps-blender);
         })
       ]);
 
       # # This is the launch script for Blender 5.2.1
       # maybe we could use `/run/current-system/sw/bin/xdg-terminal "command"`
-      runScript-5-2-1 = pkgs.writeScriptBin "blender-5-2-1-bin" ''
+      runScript = pkgs.writeScriptBin "blender-${version-dashed}-bin" ''
         echo "Running ${pkgs.lib.getBin (pkgs.glibc)}/bin/ldd $(which blender)..." \
-          && ${pkgs.lib.getBin (pkgs.glibc)}/bin/ldd $(which blender) \
+          && ${pkgs.lib.getBin (pkgs.glibc)}/bin/ldd $(which blender) | sort --ignore-leading-blanks --ignore-case | grep -E --color "\b(not found)\b|$" \
           && echo "Launching $(which blender)" \
           && echo "- with default args \"${builtins.toString blender-default-args}\"" \
           && echo "- with extra args \"$@\"" \
@@ -127,7 +129,7 @@
     # https://determinate.systems/blog/nix-run/
     # A simple executable package
     packages = {
-      blender-5-2-1-package = fhs-blender-5-2-1;
+      "blender-${version-dashed}-package" = fhs-blender;
     };
 
     # https://discourse.nixos.org/t/flakes-way-of-creating-a-fhs-environment/20821
@@ -135,20 +137,20 @@
     # https://nix.dev/manual/nix/2.34/command-ref/new-cli/nix3-run.html#apps
     # https://vtimofeenko.com/posts/practical-nix-flake-anatomy-a-guided-tour-of-flake.nix/#apps}
     apps = {
-      blender-5-2-1-app = {
+      "blender-${version-dashed}-app" = {
         type = "app";
-        program = self.packages.x86_64-linux.blender-5-2-1-package;
-        meta.description = "Launch Blender 5.2.1";
+        program = self.packages.x86_64-linux."blender-${version-dashed}-package";
+        meta.description = "Launch Blender ${version}";
       };
     };
 
     # https://hugosum.com/blog/recreating-development-environment-with-nix-flake
     devshells = {
-      blender-5-2-1-devshell = {
-        packages = pkgs-dev-5-2-1;
-        name = "blender-5-2-1-devshell";
+      "blender-${version-dashed}-devshell" = {
+        packages = pkgs-dev-blender;
+        name = "blender-${version-dashed}-devshell";
         motd = ''
-          You are now in a Blender 5.2.1 configured environment.
+          You are now in a Blender ${version} configured environment.
           Call "fhs" to setup File Hierarchy Standard.
 
           DEFAULT_ARGS = "$DEFAULT_ARGS"

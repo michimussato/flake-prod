@@ -29,9 +29,11 @@
       ];
 
       # Blender 4.4.3
-      path = "/data/share/tools/blender-4.4.3-linux-x64";
+      version = "4.4.3";
+      version-dashed = builtins.replaceStrings ["."] ["-"] version;
+      path = "/data/share/tools/blender-${version}-linux-x64";
       # # Deps
-      pkgs-deps-blender-4-4-3 = with pkgs; [
+      pkgs-deps-blender = with pkgs; [
         libxxf86vm
         libdecor
 
@@ -76,44 +78,45 @@
         export DEFAULT_ARGS="${builtins.toString blender-default-args}"
       '';
 
-      fhs-blender-4-4-3 = pkgs.buildFHSEnv {
-        name = "blender-4-4-3-package";
+      fhs-blender = pkgs.buildFHSEnv {
+        name = "blender-${version-dashed}-package";
         # /data/share/tools/blender-4.4.3-linux-x64/blender
         # bash: /data/share/tools/blender-4.4.3-linux-x64/blender: Permission denied
         inherit profile;
 
-        runScript = pkgs.lib.getExe runScript-blender-4-4-3;
+        runScript = pkgs.lib.getExe runScript-blender;
 
         # it seems like nix is `exec`ing:
         # runScript = "(${pkgs.lib.getExe runScript-4-4-3})";
         # Results in:
-        # /nix/store/22hh7ylmf62r31vzas0ir8da9kprcll8-fhs-blender-4-4-3-init: line 3: syntax error near unexpected token `/nix/store/r8mmqvnjj3ln69slmz1p2c6azkclwr41-blender-4-4-3-bin/bin/blender-4-4-3-bin'
-        # /nix/store/22hh7ylmf62r31vzas0ir8da9kprcll8-fhs-blender-4-4-3-init: line 3: `exec (/nix/store/r8mmqvnjj3ln69slmz1p2c6azkclwr41-blender-4-4-3-bin/bin/blender-4-4-3-bin) "$@"'
+        # /nix/store/22hh7ylmf62r31vzas0ir8da9kprcll8-fhs-blender-init: line 3: syntax error near unexpected token `/nix/store/r8mmqvnjj3ln69slmz1p2c6azkclwr41-blender-4-4-3-bin/bin/blender-4-4-3-bin'
+        # /nix/store/22hh7ylmf62r31vzas0ir8da9kprcll8-fhs-blender-init: line 3: `exec (/nix/store/r8mmqvnjj3ln69slmz1p2c6azkclwr41-blender-4-4-3-bin/bin/blender-4-4-3-bin) "$@"'
         # nix run /home/michael/git/repos/my-test-flake-01#blender-4-4-3
 
         # tarkgetPkgs expects a function
-        targetPkgs = pkgs: (pkgs-deps-blender-4-4-3);
+        targetPkgs = pkgs: (pkgs-deps-blender);
       };
 
-      pkgs-dev-blender-4-4-3 = (with pkgs; [
+      pkgs-dev-blender = (with pkgs; [
         # fhs shell
         (pkgs.buildFHSEnv {
           name = "fhs";
           runScript = "bash";
-          targetPkgs = pkgs: (pkgs-deps-blender-4-4-3);
+          targetPkgs = pkgs: (pkgs-deps-blender);
         })
       ]);
 
       # # This is the launch script for Blender 4.4.3
       # maybe we could use `/run/current-system/sw/bin/xdg-terminal "command"`
-      runScript-blender-4-4-3 = pkgs.writeScriptBin "blender-4-4-3-bin" ''
+      runScript-blender = pkgs.writeScriptBin "blender-${version-dashed}-bin" ''
         echo "Running ${pkgs.lib.getBin (pkgs.glibc)}/bin/ldd $(which blender)..." \
-          && ${pkgs.lib.getBin (pkgs.glibc)}/bin/ldd $(which blender) \
+          && ${pkgs.lib.getBin (pkgs.glibc)}/bin/ldd $(which blender) | sort --ignore-leading-blanks --ignore-case | grep -E --color "\b(not found)\b|$" \
           && echo "Launching $(which blender)" \
           && echo "- with default args \"${builtins.toString blender-default-args}\"" \
           && echo "- with extra args \"$@\"" \
           && echo "..." \
-          && blender ${builtins.toString blender-default-args} $@
+          && 3>&1 \
+          && exec blender ${builtins.toString blender-default-args} $@
       '';
 
     blender-default-args = [
@@ -132,7 +135,7 @@
     # https://determinate.systems/blog/nix-run/
     # A simple executable package
     packages = {
-      blender-4-4-3-package = fhs-blender-4-4-3;
+      "blender-${version-dashed}-package" = fhs-blender;
     };
 
     # https://discourse.nixos.org/t/flakes-way-of-creating-a-fhs-environment/20821
@@ -140,20 +143,20 @@
     # https://nix.dev/manual/nix/2.34/command-ref/new-cli/nix3-run.html#apps
     # https://vtimofeenko.com/posts/practical-nix-flake-anatomy-a-guided-tour-of-flake.nix/#apps}
     apps = {
-      blender-4-4-3-app = {
+      "blender-${version-dashed}-app" = {
         type = "app";
-        program = self.packages.x86_64-linux.blender-4-4-3-package;
-        meta.description = "Launch Blender 4.4.3";
+        program = self.packages.x86_64-linux."blender-${version-dashed}-package";
+        meta.description = "Launch Blender ${version}";
       };
     };
 
     # https://hugosum.com/blog/recreating-development-environment-with-nix-flake
     devshells = {
-      blender-4-4-3-devshell = {
-        packages = pkgs-dev-blender-4-4-3;
-        name = "blender-4-4-3-devshell";
+      "blender-${version-dashed}-devshell" = {
+        packages = pkgs-dev-blender;
+        name = "blender-${version-dashed}-devshell";
         motd = ''
-          You are now in a Blender 4.4.3 configured environment.
+          You are now in a Blender ${version} configured environment.
           Call "fhs" to setup File Hierarchy Standard.
 
           DEFAULT_ARGS = "$DEFAULT_ARGS"
