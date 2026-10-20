@@ -56,3 +56,15 @@ Resources:
 # Foundry Licensing
 
 - https://support.foundry.com/hc/en-us/articles/207823889-Q100104-How-to-set-up-Nuke-and-Nuke-licenses-for-a-render-farm
+
+---
+
+# Wrapper Shell
+
+```shell
+nix flake show github:michimussato/flake-prod
+```
+
+```shell
+nix develop github:michimussato/flake-prod
+```
