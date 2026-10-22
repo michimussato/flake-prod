@@ -43,8 +43,13 @@
   # /home/michael/Downloads/AYON-1.6.3-linux-rocky9/ayon addon applications launch-by-workfile-id --app blender/5-2-1 --project MovieNight --workfile-id 0b2c731a44cf4e1d88f5064be8c618bc
   # /home/michael/Downloads/AYON-1.6.3-linux-rocky9/ayon addon applications launch-debug-terminal --app blender/4-4-3 --project MovieNight --task-id eeb25140c0a011f1ab1401744809f87a
   # /home/michael/Downloads/AYON-1.6.3-linux-rocky9/ayon addon applications launch-by-id --app blender/4-4-3 --project MovieNight --task-id eeb25140c0a011f1ab1401744809f87a
-  runScript = "/home/michael/Downloads/AYON-1.6.3-linux-rocky9/ayon";
-  # runScript = "bash";
+  #
+  # $ /home/michael/Downloads/AYON-1.6.3-linux-rocky9/ayon addon applications launch-by-id --app blender/4-4-3-alacritty --project MovieNight --task-id eeb25140c0a011f1ab1401744809f87a
+  # >>> [  Colorspace management is disabled globally.  ]
+  # >>> [  Executable does not lead to blender file.Can't determine blender's python to check/install Qt binding.  ]
+  # >>> [  Launching "blender/4-4-3-alacritty" with args (10): ['/run/current-system/sw/bin/alacritty', '--hold', '--title', 'Dummy Title', '--command', '/run/current-system/sw/bin/nix', 'run', '/home/michael/git/repos/flake-prod#blender-4-4-3-app', '--', '/data/share/projects/ayon/MovieNight/shot/work/rendering/MoN_shot_rendering_v021_4-4-3.blend']  ]
+  # runScript = "set -x; /home/michael/Downloads/AYON-1.6.3-linux-rocky9/ayon --debug --verbose debug";
+  runScript = "bash";
 #  runScript = "env";
    profile = ''
      export AYON_SERVER_URL=https://ayon.openstudiolandscapes.meemoo.ch
