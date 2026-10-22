@@ -115,8 +115,7 @@
           && echo "- with default args \"${builtins.toString blender-default-args}\"" \
           && echo "- with extra args \"$@\"" \
           && echo "..." \
-          && 3>&1 \
-          && exec blender ${builtins.toString blender-default-args} $@
+          && blender ${builtins.toString blender-default-args} $@
       '';
 
     blender-default-args = [

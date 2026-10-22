@@ -63,8 +63,45 @@ Resources:
 
 ```shell
 nix flake show github:michimussato/flake-prod
+# Works as expected
 ```
 
 ```shell
-nix develop github:michimussato/flake-prod
+# From within local repo
+nix develop
+# also: nix develop .
+# Works as expected
+```
+
+```shell
+nix develop github:michimussato/flake-prod#blender-4-4-3-devshell
+# Works as expected
+```
+
+## Run Dev Shells
+
+```
+nix develop github:michimussato/flake-prod#<devShell>
+[...]
+├───devShells
+│   └───x86_64-linux
+│       ├───blender-4-4-3-devshell: development environment 'blender-4-4-3-devshell'
+│       ├───blender-5-2-1-devshell: development environment 'blender-5-2-1-devshell'
+│       ├───default: development environment 'prod-runner-wrapper-shell'
+│       ├───houdini-base: development environment 'houdini-base'
+│       ├───nuke-base: development environment 'nuke-base'
+│       └───prod-term: development environment 'prod-runner-wrapper-shell'
+[...]
+```
+
+## Run Apps
+
+```
+nix run github:michimussato/flake-prod#<app>
+[...]
+├───apps
+│   └───x86_64-linux
+│       ├───blender-4-4-3-app: app: Launch Blender 4.4.3
+│       └───blender-5-2-1-app: app: Launch Blender 5.2.1
+[...]
 ```
