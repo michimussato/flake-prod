@@ -166,23 +166,7 @@
           # automatically export all functions declared here:
           set -a
 
-          batiq-help() {
-            set -x;
-            command ${exe} $DEFAULT_ARGS --help;
-            set +x;
-          }
-
-          # batiq-app() {
-          #   set -x;
-          #   command ${exe} $DEFAULT_ARGS "$@";
-          #   set +x;
-          # }
-
-          # batiq-py() {
-          #   set -x;
-          #   command ${exe} $DEFAULT_ARGS --background --python-console "$@";
-          #   set +x;
-          # }
+          # Custom functions in this section...
 
           set +a
         '';
