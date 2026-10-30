@@ -7,10 +7,13 @@
 #
 # https://discourse.nixos.org/t/flake-parts-option-flake-modules-is-defined-multiple-times-while-its-expected-to-be-unique/71584/4
 
-{ inputs, ... }:
 {
+  inputs,
+  ...
+}: {
+
   imports = [
-    inputs.flake-parts.flakeModules.modules
+    # inputs.flake-parts.flakeModules.modules
     # inputs.devshell.flakeModule
   ];
 
@@ -20,4 +23,5 @@
 #    "x86_64-darwin"
 #    "aarch64-darwin"
   ];
+
 }
