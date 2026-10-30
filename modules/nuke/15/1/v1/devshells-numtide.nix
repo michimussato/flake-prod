@@ -242,7 +242,7 @@
     apps = {
       "nuke-${version-dashed}${v}-app" = {
         type = "app";
-        program = self.packages.x86_64-linux."nuke-${version-dashed}${v}-package";
+        program = self.packages.${pkgs.stdenv.hostPlatform.system}."nuke-${version-dashed}${v}-package";
         meta.description = "Launch Nuke ${version}${v}";
       };
     };

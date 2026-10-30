@@ -171,7 +171,7 @@
     apps = {
       "houdini-${version-dashed}-app" = {
         type = "app";
-        program = self.packages.x86_64-linux."houdini-${version-dashed}-package";
+        program = self.packages.${pkgs.stdenv.hostPlatform.system}."houdini-${version-dashed}-package";
         meta.description = "Launch Houdini ${version}";
       };
     };

@@ -144,7 +144,7 @@
     apps = {
       "blender-${version-dashed}-app" = {
         type = "app";
-        program = self.packages.x86_64-linux."blender-${version-dashed}-package";
+        program = self.packages.${pkgs.stdenv.hostPlatform.system}."blender-${version-dashed}-package";
         meta.description = "Launch Blender ${version}";
       };
     };

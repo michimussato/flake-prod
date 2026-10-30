@@ -232,7 +232,7 @@
         #  "redirect_output": true
         #}
         type = "app";
-        program = self.packages.x86_64-linux.blender-4-4-3-package;
+        program = self.packages.${pkgs.stdenv.hostPlatform.system}.blender-4-4-3-package;
         meta.description = "Launch Blender 4.4.3";
       };
 

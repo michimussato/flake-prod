@@ -135,7 +135,7 @@
     apps = {
       "batiq-${version-dashed}-app" = {
         type = "app";
-        program = self.packages.x86_64-linux."batiq-${version-dashed}-package";
+        program = self.packages.${pkgs.stdenv.hostPlatform.system}."batiq-${version-dashed}-package";
         meta.description = "Launch Batiq ${version}";
       };
     };
