@@ -47,3 +47,6 @@ ssh -t user@miniboss.meemoo.lan -- stat /data/share/tools/.stage/${pname}-${vers
 
 rm -rf ./${pname}-${version}-linux-x64
 ```
+
+`export BLENDER_USER_SCRIPTS="/data/share/tools/AYON-deps/addons/blender_1.1.9/ayon_blender/blender_addon/"`:
+![img.png](media/images/img.png)
