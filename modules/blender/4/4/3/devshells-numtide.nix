@@ -61,6 +61,8 @@
       profile = ''
         export PATH=${path}:$PATH
 
+        export BLENDER_USER_SCRIPTS="/data/share/tools/blender_user_scripts"
+
         # don't remember what this was for:
         # (does not seem to have an effect on the env anyway)
         # an alternative could be to use lib.makeLibraryPath
@@ -109,6 +111,12 @@
       # # This is the launch script for Blender 4.4.3
       # maybe we could use `/run/current-system/sw/bin/xdg-terminal "command"`
       runScript-blender = pkgs.writeScriptBin "blender-${version-dashed}-bin" ''
+        echo "Process ID:" $$
+
+        echo "BLENDER_USER_SCRIPTS is:" $BLENDER_USER_SCRIPTS
+
+        ${pkgs.util-linux}/bin/findmnt --task 1 /mounts/data/sshfs > /dev/null || echo -e "\nIs /data mounted?\n"
+
         echo "Running ${pkgs.lib.getBin (pkgs.glibc)}/bin/ldd $(which blender)..." \
           && ${pkgs.lib.getBin (pkgs.glibc)}/bin/ldd $(which blender) | sort --ignore-leading-blanks --ignore-case | grep -E --color "\b(not found)\b|$" \
           && echo "Launching $(which blender)" \
