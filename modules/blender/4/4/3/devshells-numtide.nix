@@ -61,7 +61,8 @@
       profile = ''
         export PATH=${path}:$PATH
 
-        export BLENDER_USER_SCRIPTS="/data/share/tools/blender_user_scripts"
+        # export BLENDER_USER_SCRIPTS="/data/share/tools/blender_user_scripts"
+        export BLENDER_USER_SCRIPTS="/data/share/tools/AYON-deps/addons/blender_1.1.9/ayon_blender/blender_addon/"
 
         # don't remember what this was for:
         # (does not seem to have an effect on the env anyway)
