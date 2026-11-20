@@ -61,7 +61,6 @@
       profile = ''
         export PATH=${path}:$PATH
 
-        # export BLENDER_USER_SCRIPTS="/data/share/tools/blender_user_scripts"
         export BLENDER_USER_SCRIPTS="/data/share/tools/AYON-deps/addons/blender_1.1.9/ayon_blender/blender_addon/"
 
         # don't remember what this was for:
@@ -73,6 +72,8 @@
         ]}:$LD_LIBRARY_PATH
 
         # export QT_QPA_PLATFORM=xcb
+        # Does this have an effect?
+        # equivalent to --python-use-system-env
         export AYON_BLENDER_USE_SYSTEM_PATH=1
 
         # No effect; still uses xterm:
@@ -116,7 +117,17 @@
 
         echo "BLENDER_USER_SCRIPTS is:" $BLENDER_USER_SCRIPTS
 
-        ${pkgs.util-linux}/bin/findmnt --task 1 /mounts/data/sshfs > /dev/null || echo -e "\nIs /data mounted?\n"
+        # We can't use `readlink /data` in the container
+        # echo "/data points to: $(readlink /data)"
+
+        ${pkgs.util-linux}/bin/findmnt --task 1 /mounts/data/sshfs > /dev/null
+
+        # $? represents the last return code
+        if [ $? -gt 0 ]; then
+          echo -e "\nIs /data mounted?\n"
+          echo "Exitting."
+          exit 1
+        fi
 
         echo "Running ${pkgs.lib.getBin (pkgs.glibc)}/bin/ldd $(which blender)..." \
           && ${pkgs.lib.getBin (pkgs.glibc)}/bin/ldd $(which blender) | sort --ignore-leading-blanks --ignore-case | grep -E --color "\b(not found)\b|$" \
