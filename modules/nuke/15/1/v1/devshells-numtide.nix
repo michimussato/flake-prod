@@ -134,6 +134,23 @@
       # # This is the launch script for Blender 4.4.3
       # maybe we could use `/run/current-system/sw/bin/xdg-terminal "command"`
       runScript-nuke = pkgs.writeScriptBin "nuke-${version}${v}-bin" ''
+        echo "Process ID:" $$
+
+        # Print all AYON_* environment variables with their values
+        printenv | grep '^AYON_'
+
+        # We can't use `readlink /data` in the container
+        # echo "/data points to: $(readlink /data)"
+
+        ${pkgs.util-linux}/bin/findmnt --task 1 /mounts/data/sshfs > /dev/null
+
+        # $? represents the last return code
+        if [ $? -gt 0 ]; then
+          echo -e "\nIs /data mounted?\n"
+          echo "Exitting."
+          exit 1
+        fi
+
         echo "Running ${pkgs.lib.getBin (pkgs.glibc)}/bin/ldd $(which Nuke${version})..." \
           && ${pkgs.lib.getBin (pkgs.glibc)}/bin/ldd $(which Nuke${version}) | sort --ignore-leading-blanks --ignore-case | grep -E --color "\b(not found)\b|$" \
           && echo "Launching $(which Nuke${version})" \

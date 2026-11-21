@@ -123,6 +123,8 @@ export AYON_DEBUG="1"
 export AYON_EXECUTABLE="/data/share/tools/AYON-1.6.3-linux-rocky9/ayon"
 # AYON_BLENDER_USER_SCRIPTS
 # export BLENDER_USER_SCRIPTS="/data/share/tools/AYON-deps/addons/blender_1.1.9/ayon_blender/blender_addon/addons/"
+# In Blender, loom is loaded from:
+#                              /data/share/tools/AYON-deps/addons/blender_1.1.9/ayon_blender/blender_addon/addons/
 export BLENDER_USER_SCRIPTS="/data/share/tools/AYON-deps/addons/blender_1.1.9/ayon_blender/blender_addon/"
 # export AYON_LAUNCHER_STORAGE_DIR="/data/share/tools/AYON-deps"
 export AYON_LAUNCHER_STORAGE_DIR="/data/share/tools/AYON-deps"

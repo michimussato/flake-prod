@@ -138,6 +138,9 @@
       runScript-houdini = pkgs.writeScriptBin "houdini-${version-dashed}-bin" ''
         echo "Process ID:" $$
 
+        # Print all AYON_* environment variables with their values
+        printenv | grep '^AYON_'
+
         # We can't use `readlink /data` in the container
         # echo "/data points to: $(readlink /data)"
 

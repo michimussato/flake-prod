@@ -106,7 +106,10 @@
       runScript = pkgs.writeScriptBin "blender-${version-dashed}-bin" ''
         echo "Process ID:" $$
 
-        echo "BLENDER_USER_SCRIPTS is:" $BLENDER_USER_SCRIPTS
+        echo "BLENDER_USER_SCRIPTS = $BLENDER_USER_SCRIPTS"
+
+        # Print all AYON_* environment variables with their values
+        printenv | grep '^AYON_'
 
         # We can't use `readlink /data` in the container
         # echo "/data points to: $(readlink /data)"

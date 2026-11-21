@@ -112,10 +112,16 @@
 
       # # This is the launch script for Blender 4.4.3
       # maybe we could use `/run/current-system/sw/bin/xdg-terminal "command"`
+      # Todo:
+      #  - [ ] Could we redirect Alacritty output to $AYON_PID_FILE?
+      #        $AYON_PID_FILE is something like '/tmp/ayon_pid_0wdidett.txt'
       runScript-blender = pkgs.writeScriptBin "blender-${version-dashed}-bin" ''
         echo "Process ID:" $$
 
-        echo "BLENDER_USER_SCRIPTS is:" $BLENDER_USER_SCRIPTS
+        echo "BLENDER_USER_SCRIPTS = $BLENDER_USER_SCRIPTS"
+
+        # Print all AYON_* environment variables with their values
+        printenv | grep '^AYON_'
 
         # We can't use `readlink /data` in the container
         # echo "/data points to: $(readlink /data)"
