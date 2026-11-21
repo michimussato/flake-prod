@@ -135,6 +135,7 @@
           && echo "- with default args \"${builtins.toString blender-default-args}\"" \
           && echo "- with extra args \"$@\"" \
           && echo "..." \
+          && echo "PYTHONPATH = " $PYTHONPATH
           && blender ${builtins.toString blender-default-args} $@
       '';
 
