@@ -116,7 +116,7 @@
       #  - [ ] Could we redirect Alacritty output to $AYON_PID_FILE?
       #        $AYON_PID_FILE is something like '/tmp/ayon_pid_0wdidett.txt'
       runScript-blender = pkgs.writeScriptBin "blender-${version-dashed}-bin" ''
-        echo "Process ID:" $$
+        echo "This process ID (fhs-blender): $$"
 
         echo "BLENDER_USER_SCRIPTS = $BLENDER_USER_SCRIPTS"
 
@@ -144,7 +144,7 @@
           && echo "- with default args \"${builtins.toString blender-default-args}\"" \
           && echo "- with extra args \"$@\"" \
           && echo "..." \
-          && blender ${builtins.toString blender-default-args} $@
+          && exec $(which blender) ${builtins.toString blender-default-args} $@
       '';
 
     blender-default-args = [
