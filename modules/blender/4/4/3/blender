@@ -1,5 +1,8 @@
 #!/run/current-system/sw/bin/bash
 
+# A wrapper script as main entry point for nix backed blender
+# Status: WIP
+
 # echo "This process: $$"
 # echo "Parent Process $PPID"
 
@@ -9,7 +12,6 @@
 # fd 2: stderr
 
 
-# PREV=$(ls -l /proc/$$/fd)
 FD_STDOUT=$(echo $(ls -l /proc/$$/fd/1) | awk -F " -> " '{print $NF}')
 FD_STDERR=$(echo $(ls -l /proc/$$/fd/2) | awk -F " -> " '{print $NF}')
 # these should be equal
@@ -39,385 +41,6 @@ echo "Parent Process ID: $PPID"
 
 env
 
-# replace parent 'bwrap' with this process
-# exec
-
-# $ ps -p 5246 -o args=
-# /data/share/tools/blender-4.4.3-linux-x64/blender --python-use-system-env /data/share/projects/ayon/MovieNight/shot/work/rendering/MoN_shot_rendering_v041_4-4-3.blend
-
-# $ ps -aux | grep 5246
-# user        5246  5.0  8.4 3958044 2091404 pts/2 Sl+  20:56   1:29 /data/share/tools/blender-4.4.3-linux-x64/blender --python-use-system-env /data/share/projects/ayon/MovieNight/shot/work/rendering/MoN_shot_rendering_v041_4-4-3.blend
-
-# But in htop for 5246:
-# /home/user/git/repos/ayon-launcher/build/AYON-1.6.3-linux-rocky9/app_launcher /tmp/ay_app_argsjy054mv9.json
-
-
-# AYON Process Monitor shows `66605'
-# $ nix shell nixpkgs#pstree --command pstree -p 66605
-# -+= 00001 root /run/current-system/systemd/lib/systemd/systemd --switched-root --system --deserialize=43
-#  \-+= 02467 michael /nix/store/c07lnqjmlanqigp5g007i561n0gmb95l-systemd-260.5/lib/systemd/systemd --user
-#    \-+- 66605 michael /nix/store/1hdv13fdl67zzkjaydylpmnlxvfmcgf2-bubblewrap-0.12.0/bin/bwrap --dev-bind /dev /dev --proc /proc --chdir /home/michael --die-with-parent --bind /nix /nix --tmpfs /nix/store/pagq7gjgxqbi09g0091x2cxwq2kwxyx8-glibc-2.42-103/etc --tmpfs /etc --symlink /etc/ld.so.conf /nix/store/p
-#      \-+- 66654 michael /nix/store/8favl12dxjfxwzgqq5jh53k2kjn19nn9-bash-5.3p9/bin/bash /init /data/share/projects/ayon/MovieNight/shot/work/rendering/MoN_shot_rendering_v041_4-4-3.blend
-#        \--- 66677 michael blender --python-use-system-env --enable-autoexec --verbose 4 --debug --debug-cycles --debug-ffmpeg /data/share/projects/ayon/MovieNight/shot/work/rendering/MoN_shot_rendering_v041_4-4-3.blend
-
-
-# $ nix shell nixpkgs#pstree --command pstree -s blender
-# -+= 00001 root /run/current-system/systemd/lib/systemd/systemd --switched-root --system --deserialize=43
-#  \-+= 02467 michael /nix/store/c07lnqjmlanqigp5g007i561n0gmb95l-systemd-260.5/lib/systemd/systemd --user
-#    |-+- 66605 michael /nix/store/1hdv13fdl67zzkjaydylpmnlxvfmcgf2-bubblewrap-0.12.0/bin/bwrap --dev-bind /dev /dev --proc /proc --chdir /home/michael --die-with-parent --bind /nix /nix --tmpfs /nix/store/pagq7gjgxqbi09g0091x2cxwq2kwxyx8-glibc-2.42-103/etc --tmpfs /etc --symlink /etc/ld.so.conf /nix/store/p
-#    | \-+- 66654 michael /nix/store/8favl12dxjfxwzgqq5jh53k2kjn19nn9-bash-5.3p9/bin/bash /init /data/share/projects/ayon/MovieNight/shot/work/rendering/MoN_shot_rendering_v041_4-4-3.blend
-#    |   \--- 66677 michael blender --python-use-system-env --enable-autoexec --verbose 4 --debug --debug-cycles --debug-ffmpeg /data/share/projects/ayon/MovieNight/shot/work/rendering/MoN_shot_rendering_v041_4-4-3.blend
-#    \--- 59889 michael /run/current-system/sw/bin/alacritty --hold --command nix run /home/michael/git/repos/flake-prod#blender-4-4-3-package -- /data/share/projects/ayon/MovieNight/shot/work/rendering/MoN_shot_rendering_v041_4-4-3.blend
-
-
-# current fhs exec:
-# AYON Process Manager: 81192
-# Process ID in output: 81267
-# $ nix shell nixpkgs#pstree --command pstree -p 81267
-# -+= 00001 root /run/current-system/systemd/lib/systemd/systemd --switched-root --system --deserialize=43
-#  \-+= 02467 michael /nix/store/c07lnqjmlanqigp5g007i561n0gmb95l-systemd-260.5/lib/systemd/systemd --user
-#    \-+- 81192 michael /nix/store/1hdv13fdl67zzkjaydylpmnlxvfmcgf2-bubblewrap-0.12.0/bin/bwrap --dev-bind /dev /dev --proc /proc --chdir /home/michael --die-with-parent --bind /nix /nix --tmpfs /nix/store/pagq7gjgxqbi09g0091x2cxwq2kwxyx8-glibc-2.42-103/etc --tmpfs /etc --symlink /etc/ld.so.conf /nix/store/p
-#      \-+- 81267 michael /nix/store/8favl12dxjfxwzgqq5jh53k2kjn19nn9-bash-5.3p9/bin/bash /init /data/share/projects/ayon/MovieNight/shot/work/rendering/MoN_shot_rendering_v041_4-4-3.blend
-#        \--- 81287 michael blender --python-use-system-env --enable-autoexec --verbose 4 --debug --debug-cycles --debug-ffmpeg /data/share/projects/ayon/MovieNight/shot/work/rendering/MoN_shot_rendering_v041_4-4-3.blend
-
-
-# fhs bash
-# $ nix shell nixpkgs#pstree --command pstree -p 116620
-# -+= 00001 root /run/current-system/systemd/lib/systemd/systemd --switched-root --system --deserialize=43
-#  \-+= 02467 michael /run/current-system/systemd/lib/systemd/systemd --user --deserialize=84
-#    \-+- 116620 michael /nix/store/1hdv13fdl67zzkjaydylpmnlxvfmcgf2-bubblewrap-0.12.0/bin/bwrap --dev-bind /dev /dev --proc /proc --chdir /home/michael --die-with-parent --bind /nix /nix --tmpfs /nix/store/pagq7gjgxqbi09g0091x2cxwq2kwxyx8-glibc-2.42-103/etc --tmpfs /etc --symlink /etc/ld.so.conf /nix/store/
-#      \-+- 116827 michael /nix/store/8favl12dxjfxwzgqq5jh53k2kjn19nn9-bash-5.3p9/bin/bash /init /data/share/projects/ayon/MovieNight/shot/work/rendering/MoN_shot_rendering_v041_4-4-3.blend
-#        \--- 116843 michael blender --python-use-system-env --enable-autoexec --verbose 4 --debug --debug-cycles --debug-ffmpeg /data/share/projects/ayon/MovieNight/shot/work/rendering/MoN_shot_rendering_v041_4-4-3.blend
-
-
-# $ nix shell nixpkgs#pstree --command pstree -p 123931
-# -+= 00001 root /run/current-system/systemd/lib/systemd/systemd --switched-root --system --deserialize=43
-#  \-+= 02467 michael /run/current-system/systemd/lib/systemd/systemd --user --deserialize=84
-#    \-+- 123931 michael /nix/store/1hdv13fdl67zzkjaydylpmnlxvfmcgf2-bubblewrap-0.12.0/bin/bwrap --dev-bind /dev /dev --proc /proc --chdir /home/michael --die-with-parent --bind /nix /nix --tmpfs /nix/store/pagq7gjgxqbi09g0091x2cxwq2kwxyx8-glibc-2.42-103/etc --tmpfs /etc --symlink /etc/ld.so.conf /nix/store/
-#      \--- 124040 michael blender --python-use-system-env --enable-autoexec --verbose 4 --debug --debug-cycles --debug-ffmpeg /data/share/projects/ayon/MovieNight/shot/work/rendering/MoN_shot_rendering_v041_4-4-3.blend
-
-
-#[michael@lenovo djv] (main)$ nix shell nixpkgs#pstree --command pstree -p 132081
-#-+= 00001 root /run/current-system/systemd/lib/systemd/systemd --switched-root --system --deserialize=43
-# \-+= 02467 michael /run/current-system/systemd/lib/systemd/systemd --user --deserialize=84
-#   \-+- 132081 michael /nix/store/1hdv13fdl67zzkjaydylpmnlxvfmcgf2-bubblewrap-0.12.0/bin/bwrap --dev-bind /dev /dev --proc /proc --chdir /home/michael --die-with-parent --bind /nix /nix --tmpfs /nix/store/pagq7gjgxqbi09g0091x2cxwq2kwxyx8-glibc-2.42-103/etc --tmpfs /etc --symlink /etc/ld.so.conf /nix/store/
-#     \--- 132294 michael blender --python-use-system-env --enable-autoexec --verbose 4 --debug --debug-cycles --debug-ffmpeg /data/share/projects/ayon/MovieNight/shot/work/rendering/MoN_shot_rendering_v041_4-4-3.blend
-#[michael@lenovo djv] (main)$ sudo ls -al /proc/132081/fd
-#total 0/run/current-system/sw/bin/nix run /home/michael/git/repos/flake-prod#blender-4-4-3-app -- $@ |&
-#dr-x------ 2 michael users  4 Nov 23 01:12 .
-#dr-xr-xr-x 9 michael users  0 Nov 23 01:12 ..
-#lrwx------ 1 michael users 64 Nov 23 01:12 0 -> /dev/pts/7
-#l-wx------ 1 michael users 64 Nov 23 01:12 1 -> /tmp/ayon_blender_output_tcar_jxs.txt
-#l-wx------ 1 michael users 64 Nov 23 01:12 2 -> /tmp/ayon_blender_output_tcar_jxs.txt
-#lrwx------ 1 michael users 64 Nov 23 01:12 3 -> 'anon_inode:[signalfd]'
-
-
-# $ cat /tmp/ay_app_*.json
-#{
-#  "args": [
-#    "/data/share/tools/blender-4.4.3-linux-x64/blender",
-#    "--python-use-system-env",
-#    "/data/share/projects/ayon/MovieNight/shot/work/rendering/MoN_shot_rendering_v041_4-4-3.blend"
-#  ],
-#  "env": {
-#    "AYON_ADDONS_DIR": "/home/user/.local/share/AYON/addons",
-#    "AYON_DEFAULT_SETTINGS_VARIANT": "production",
-#    "AYON_DEPENDENCIES_DIR": "/home/user/.local/share/AYON/dependency_packages",
-#    "AYON_EXECUTABLE": "/home/user/git/repos/ayon-launcher/build/AYON-1.6.3-linux-rocky9/ayon",
-#    "AYON_IN_LOGIN_MODE": "1",
-#    "AYON_LAUNCHER_LOCAL_DIR": "/home/user/.local/share/AYON",
-#    "AYON_LAUNCHER_STORAGE_DIR": "/home/user/.local/share/AYON",
-#    "AYON_MENU_LABEL": "AYON",
-#    "AYON_ROOT": "/home/user/git/repos/ayon-launcher/build/AYON-1.6.3-linux-rocky9",
-#    "AYON_SERVER_URL": "https://ayon.openstudiolandscapes.meemoo.ch",
-#    "AYON_SITE_ID": "sceptical-happy-earwig",
-#    "AYON_STATICS_SERVER": "http://127.0.0.1:25283/res",
-#    "AYON_UNREAL_ROOT": "/home/user/.local/share/AYON/addons/unreal_0.4.0/ayon_unreal",
-#    "AYON_VERSION": "1.6.3",
-#    "AYON_WEBSERVER_URL": "http://127.0.0.1:25283",
-#    "BUILTIN_OCIO_ROOT": "/home/user/.local/share/AYON/addons/ayon_ocio_1.2.2/ayon_ocio/configs/OpenColorIOConfigs",
-#    "CLUTTER_DISABLE_MIPMAPPED_TEXT": "1",
-#    "COLORTERM": "truecolor",
-#    "DBUS_SESSION_BUS_ADDRESS": "unix:path=/run/user/1000/bus",
-#    "DEBUGINFOD_URLS": "https://debuginfod.ubuntu.com ",
-#    "DESKTOP_SESSION": "ubuntu",
-#    "DISPLAY": ":0",
-#    "GDMSESSION": "ubuntu",
-#    "GNOME_DESKTOP_SESSION_ID": "this-is-deprecated",
-#    "GNOME_SETUP_DISPLAY": ":1",
-#    "GNOME_SHELL_SESSION_MODE": "ubuntu",
-#    "GNOME_TERMINAL_SCREEN": "/org/gnome/Terminal/screen/750d7448_c2f2_4c6d_b8b2_1af78c2896b8",
-#    "GNOME_TERMINAL_SERVICE": ":1.110",
-#    "GSM_SKIP_SSH_AGENT_WORKAROUND": "true",
-#    "GTK_MODULES": "gail:atk-bridge",
-#    "HOME": "/home/user",
-#    "IM_CONFIG_PHASE": "1",
-#    "KITSU_LOGIN": "admin@example.com",
-#    "KITSU_PWD": "mysecretpassword",
-#    "KITSU_SERVER": "http://192.168.178.15:4545/api",
-#    "LANG": "en_US.UTF-8",
-#    "LESSCLOSE": "/usr/bin/lesspipe %s %s",
-#    "LESSOPEN": "| /usr/bin/lesspipe %s",
-#    "LOGNAME": "user",
-#    "LS_COLORS": "rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:",
-#    "MEMORY_PRESSURE_WATCH": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/session.slice/org.gnome.Shell@wayland.service/memory.pressure",
-#    "MEMORY_PRESSURE_WRITE": "c29tZSAyMDAwMDAgMjAwMDAwMAA=",
-#    "PATH": "/home/user/.pyenv/shims:/home/user/.pyenv/bin:/home/user/.cargo/bin:/home/user/.pyenv/bin:/home/user/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin",
-#    "PWD": "/home/user/git/repos/ayon-launcher",
-#    "PYENV_ROOT": "/home/user/.pyenv",
-#    "PYENV_SHELL": "bash",
-#    "PYSIDE6_OPTION_PYTHON_ENUM": "True",
-#    "QT_ACCESSIBILITY": "1",
-#    "QT_AUTO_SCREEN_SCALE_FACTOR": "1",
-#    "QT_IM_MODULE": "ibus",
-#    "SESSION_MANAGER": "local/user-Standard-PC-Q35-ICH9-2009:@/tmp/.ICE-unix/1337,unix/user-Standard-PC-Q35-ICH9-2009:/tmp/.ICE-unix/1337",
-#    "SHELL": "/bin/bash",
-#    "SHLVL": "1",
-#    "SSH_AUTH_SOCK": "/run/user/1000/keyring/ssh",
-#    "SSL_CERT_FILE": "/home/user/git/repos/ayon-launcher/build/AYON-1.6.3-linux-rocky9/dependencies/certifi/cacert.pem",
-#    "STUDIO_SW": "/mnt/REPO_SW",
-#    "SYSTEMD_EXEC_PID": "1374",
-#    "TERM": "xterm",
-#    "USER": "user",
-#    "USERNAME": "user",
-#    "USE_AYON_SERVER": "1",
-#    "VTE_VERSION": "7600",
-#    "WAYLAND_DISPLAY": "wayland-0",
-#    "XAUTHORITY": "/run/user/1000/.mutter-Xwaylandauth.FDQCZ3",
-#    "XDG_CONFIG_DIRS": "/etc/xdg/xdg-ubuntu:/etc/xdg",
-#    "XDG_CURRENT_DESKTOP": "ubuntu:GNOME",
-#    "XDG_DATA_DIRS": "/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop",
-#    "XDG_MENU_PREFIX": "gnome-",
-#    "XDG_RUNTIME_DIR": "/run/user/1000",
-#    "XDG_SESSION_CLASS": "user",
-#    "XDG_SESSION_DESKTOP": "ubuntu",
-#    "XDG_SESSION_TYPE": "wayland",
-#    "XMODIFIERS": "@im=ibus",
-#    "_": "./build/AYON-1.6.3-linux-rocky9/ayon",
-#    "PYTHONPATH": "/data/share/tools/blender-4.4.3-linux-x64/4.4/python/lib/python3.11:/data/share/tools/blender-4.4.3-linux-x64/4.4/python/lib/python3.11/site-packages:/home/user/.local/share/AYON/addons/blender_1.1.9/ayon_blender/blender_addon:/home/user/.local/share/AYON/addons/core_1.9.12/ayon_core/vendor/python:/home/user/git/repos/ayon-launcher/build/AYON-1.6.3-linux-rocky9/common:/home/user/git/repos/ayon-launcher/build/AYON-1.6.3-linux-rocky9/dependencies:/home/user/.local/share/AYON/addons/aftereffects_0.3.7:/home/user/.local/share/AYON/addons/applications_1.4.6:/home/user/.local/share/AYON/addons/ayon_ocio_1.2.2:/home/user/.local/share/AYON/addons/ayon_third_party_1.4.0:/home/user/.local/share/AYON/addons/blender_1.1.9:/home/user/.local/share/AYON/addons/celaction_0.2.5:/home/user/.local/share/AYON/addons/cinema4d_0.2.0:/home/user/.local/share/AYON/addons/clockify_0.2.2:/home/user/.local/share/AYON/addons/core_1.9.12:/home/user/.local/share/AYON/addons/deadline_0.7.3:/home/user/.local/share/AYON/addons/equalizer_0.2.1:/home/user/.local/share/AYON/addons/flame_1.4.3:/home/user/.local/share/AYON/addons/fusion_0.4.2:/home/user/.local/share/AYON/addons/harmony_0.5.4:/home/user/.local/share/AYON/addons/hiero_0.6.3:/home/user/.local/share/AYON/addons/houdini_0.10.7:/home/user/.local/share/AYON/addons/kitsu_1.2.7:/home/user/.local/share/AYON/addons/marvelous_designer_1.1.3:/home/user/.local/share/AYON/addons/max_0.5.1:/home/user/.local/share/AYON/addons/maya_0.6.12:/home/user/.local/share/AYON/addons/mocha_1.1.0:/home/user/.local/share/AYON/addons/motionbuilder_0.2.1:/home/user/.local/share/AYON/addons/nuke_0.4.15:/home/user/.local/share/AYON/addons/openrv_1.2.3:/home/user/.local/share/AYON/addons/photoshop_0.4.7:/home/user/.local/share/AYON/addons/premiere_0.2.3:/home/user/.local/share/AYON/addons/resolve_0.6.3:/home/user/.local/share/AYON/addons/silhouette_0.2.2:/home/user/.local/share/AYON/addons/sitesync_1.3.2:/home/user/.local/share/AYON/addons/slack_1.3.1:/home/user/.local/share/AYON/addons/substancedesigner_0.2.1:/home/user/.local/share/AYON/addons/substancepainter_0.3.6:/home/user/.local/share/AYON/addons/timers_manager_0.2.0:/home/user/.local/share/AYON/addons/traypublisher_0.4.5:/home/user/.local/share/AYON/addons/tvpaint_0.4.3:/home/user/.local/share/AYON/addons/unreal_0.4.0:/home/user/.local/share/AYON/addons/zbrush_0.4.1:/home/user/.local/share/AYON/dependency_packages/ayon_2609041250_linux-rocky9.zip/dependencies",
-#    "AYON_PROJECT_NAME": "MovieNight",
-#    "AYON_WEBACTION_EVENT_ID": "ec399250e6b311f1a77d86aebf0e9dbd",
-#    "AYON_API_KEY": "36cf5be2dcb124864f7dc9759bfdb5096e94f/tmp/logcf48fa3f0173b658568a80d39ad",
-#    "AYON_BUNDLE_NAME": "2026.09.0-2026-10-23-02",
-#    "AYON_STUDIO_BUNDLE_NAME": "2026.09.0-2026-10-23-02",
-#    "BLENDER_USER_SCRIPTS": "/home/user/.local/share/AYON/addons/blender_1.1.9/ayon_blender/blender_addon",
-#    "AYON_BLENDER_USER_SCRIPTS": "",
-#    "AYON_APP_TOOLS": "",
-#    "AYON_APP_NAME": "blender/4-4-3-virsh",
-#    "AYON_FOLDER_PATH": "/shot",
-#    "AYON_TASK_NAME": "rendering",
-#    "AYON_HOST_NAME": "blender",
-#    "AYON_WORKDIR": "/data/share/projects/ayon/MovieNight/shot/work/rendering",
-#    "AVALON_OPEN_LAST_WORKFILE": "1",
-#    "AYON_WORKFILE_TOOL_ON_START": "0",
-#    "AYON_LAST_WORKFILE": "/data/share/projects/ayon/MovieNight/shot/work/rendering/MoN_shot_rendering_v041_4-4-3.blend"
-#  },
-#  "pid_file": "/tmp/ayon_pid_qj_b8x4y.txt",
-#  "stdout": "/tmp/ayon_blender_output_rvn0wgyo.txt",
-#  "stderr": "/tmp/ayon_blender_output_rvn0wgyo.txt"
-#}
-
-
-# while true; do cat --plain /tmp/ay_app_*.json; sleep 0.2; done
-#{
-#  "args": [
-#    "/run/current-system/sw/bin/alacritty",
-#    "--hold",
-#    "--title",
-#    "/home/michael/git/repos/flake-prod#blender-4-4-3-app",
-#    "--command",
-#    "/run/current-system/sw/bin/nix",
-#    "run",
-#    "/home/michael/git/repos/flake-prod#blender-4-4-3-app",
-#    "--",
-#    "/data/share/projects/ayon/MovieNight/shot/work/rendering/MoN_shot_rendering_v041_4-4-3.blend"
-#  ],
-#  "env": {
-#    "ACLOCAL_PATH": "/usr/share/aclocal",
-#    "AYON_ADDONS_DIR": "/data/share/tools/AYON-deps/addons",
-#    "AYON_DEBUG": "1",
-#    "AYON_DEFAULT_SETTINGS_VARIANT": "production",
-#    "AYON_DEPENDENCIES_DIR": "/data/share/tools/AYON-deps/dependency_packages",
-#    "AYON_EXECUTABLE": "/data/share/tools/AYON-1.6.3-linux-rocky9/ayon",
-#    "AYON_IN_LOGIN_MODE": "1",
-#    "AYON_LAUNCHER_LOCAL_DIR": "/home/michael/.local/share/AYON",
-#    "AYON_LAUNCHER_STORAGE_DIR": "/data/share/tools/AYON-deps",
-#    "AYON_MENU_LABEL": "AYON",
-#    "AYON_ROOT": "/data/share/tools/AYON-1.6.3-linux-rocky9",
-#    "AYON_SERVER_URL": "https://ayon.openstudiolandscapes.meemoo.ch",
-#    "AYON_SITE_ID": "secret-buffalo-of-downpour",
-#    "AYON_STATICS_SERVER": "http://127.0.0.1:64620/res",
-#    "AYON_UNREAL_ROOT": "/data/share/tools/AYON-deps/addons/unreal_0.4.0/ayon_unreal",
-#    "AYON_VERSION": "1.6.3",
-#    "AYON_WEBSERVER_URL": "http://127.0.0.1:64620",
-#    "BUILTIN_OCIO_ROOT": "/data/share/tools/AYON-deps/addons/ayon_ocio_1.2.2/ayon_ocio/configs/OpenColorIOConfigs",
-#    "COLORFGBG": "15;0",
-#    "COLORTERM": "truecolor",
-#    "DBUS_SESSION_BUS_ADDRESS": "unix:path=/run/user/1001/bus",
-#    "DEFAULT_ARGS": "--debug",
-#    "DESKTOP_SESSION": "plasma",
-#    "DISPLAY": ":0",
-#    "EDITOR": "hx",
-#    "FLATPAK_TTY_PROGRESS": "1",
-#    "GDK_PIXBUF_MODULE_FILE": "/nix/store/gmw2pasb5da22invj9qn013dlpbd85jz-gdk-pixbuf-loaders.cache",
-#    "GIO_EXTRA_MODULES": "/nix/store/5x801mwdvl7868fa1wgz9d9n42d4kvbn-dconf-0.49.0-lib/lib/gio/modules",
-#    "GST_PLUGIN_SYSTEM_PATH_1_0": "/usr/lib/gstreamer-1.0:/usr/lib32/gstreamer-1.0",
-#    "GTK2_RC_FILES": "/etc/gtk-2.0/gtkrc:/home/michael/.gtkrc-2.0:/home/michael/.config/gtkrc-2.0",
-#    "GTK_PATH": "/home/michael/.nix-profile/lib/gtk-2.0:/home/michael/.nix-profile/lib/gtk-3.0:/home/michael/.nix-profile/lib/gtk-4.0:/nix/profile/lib/gtk-2.0:/nix/profile/lib/gtk-3.0:/nix/profile/lib/gtk-4.0:/home/michael/.local/state/nix/profile/lib/gtk-2.0:/home/michael/.local/state/nix/profile/lib/gtk-3.0:/home/michael/.local/state/nix/profile/lib/gtk-4.0:/etc/profiles/per-user/michael/lib/gtk-2.0:/etc/profiles/per-user/michael/lib/gtk-3.0:/etc/profiles/per-user/michael/lib/gtk-4.0:/nix/var/nix/profiles/default/lib/gtk-2.0:/nix/var/nix/profiles/default/lib/gtk-3.0:/nix/var/nix/profiles/default/lib/gtk-4.0:/run/current-system/sw/lib/gtk-2.0:/run/current-system/sw/lib/gtk-3.0:/run/current-system/sw/lib/gtk-4.0",
-#    "GTK_RC_FILES": "/etc/gtk/gtkrc:/home/michael/.gtkrc:/home/michael/.config/gtkrc",
-#    "HOME": "/home/michael",
-#    "ICEAUTHORITY": "/run/user/1001/iceauth_UgtVeV",
-#    "INFOPATH": "/home/michael/.nix-profile/info:/home/michael/.nix-profile/share/info:/nix/profile/info:/nix/profile/share/info:/home/michael/.local/state/nix/profile/info:/home/michael/.local/state/nix/profile/share/info:/etc/profiles/per-user/michael/info:/etc/profiles/per-user/michael/share/info:/nix/var/nix/profiles/default/info:/nix/var/nix/profiles/default/share/info:/run/current-system/sw/info:/run/current-system/sw/share/info",
-#    "INVOCATION_ID": "00dfb22beadc416b95b3f42bebf17bf3",
-#    "JOURNAL_STREAM": "12:21947",
-#    "KDE_APPLICATIONS_AS_SCOPE": "1",
-#    "KDE_FULL_SESSION": "true",
-#    "KDE_SESSION_UID": "1001",
-#    "KDE_SESSION_VERSION": "6",
-#    "KITSU_LOGIN": "admin@example.com",
-#    "KITSU_PWD": "mysecretpassword",
-#    "KITSU_SERVER": "http://192.168.178.15:4545/api",
-#    "KONSOLE_DBUS_ACTIVATION_COOKIE": "TXbYpVqw2pe1M9YMt/L3q0xTCX1s3iRI23SoWnPOwG4=",
-#    "KONSOLE_DBUS_SERVICE": ":1.173",
-#    "KONSOLE_DBUS_SESSION": "/Sessions/1",
-#    "KONSOLE_DBUS_WINDOW": "/Windows/1",
-#    "KONSOLE_VERSION": "260403",
-#    "KPACKAGE_DEP_RESOLVERS_PATH": "/nix/store/s9ya31v7wpqfvdc7hwjph7vy9krfq9dk-frameworkintegration-6.26.0/libexec/kf6/kpackagehandlers",
-#    "LANG": "en_US.UTF-8",
-#    "LANGUAGE": "",
-#    "LD_LIBRARY_PATH": "/nix/store/zxwka44qmnak3j0qsk5miljll0r8h8ly-wayland-1.25.0/lib:",
-#    "LESSKEYIN_SYSTEM": "/nix/store/cdqbny7chlcd56gp7pj8pzvbdcihchq5-lessconfig",
-#    "LIBEXEC_PATH": "/home/michael/.nix-profile/libexec:/nix/profile/libexec:/home/michael/.local/state/nix/profile/libexec:/etc/profiles/per-user/michael/libexec:/nix/var/nix/profiles/default/libexec:/run/current-system/sw/libexec",
-#    "LOCALE_ARCHIVE": "/run/current-system/sw/lib/locale/locale-archive",
-#    "LOCALE_ARCHIVE_2_27": "/nix/store/ws0j8fvq4agarwyk4z6kps0szj6pkn1q-glibc-locales-2.42-103/lib/locale/locale-archive",
-#    "LOGNAME": "michael",
-#    "LS_COLORS": "rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.7z=01;31:*.ace=01;31:*.alz=01;31:*.apk=01;31:*.arc=01;31:*.arj=01;31:*.bz=01;31:*.bz2=01;31:*.cab=01;31:*.cpio=01;31:*.crate=01;31:*.deb=01;31:*.drpm=01;31:*.dwm=01;31:*.dz=01;31:*.ear=01;31:*.egg=01;31:*.esd=01;31:*.gz=01;31:*.jar=01;31:*.lha=01;31:*.lrz=01;31:*.lz=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.lzo=01;31:*.pyz=01;31:*.rar=01;31:*.rpm=01;31:*.rz=01;31:*.sar=01;31:*.swm=01;31:*.t7z=01;31:*.tar=01;31:*.taz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tgz=01;31:*.tlz=01;31:*.txz=01;31:*.tz=01;31:*.tzo=01;31:*.tzst=01;31:*.udeb=01;31:*.war=01;31:*.whl=01;31:*.wim=01;31:*.xz=01;31:*.z=01;31:*.zip=01;31:*.zoo=01;31:*.zst=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.jxl=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:",
-#    "MANAGERPID": "2467",
-#    "MANAGERPIDFDID": "16603",
-#    "MEMORY_PRESSURE_WATCH": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/session.slice/plasma-plasmashell.service/memory.pressure",
-#    "MEMORY_PRESSURE_WRITE": "c29tZSAyMDAwMDAgMjAwMDAwMAA=",
-#    "NIXPKGS_CONFIG": "/etc/nix/nixpkgs-config.nix",
-#    "NIXPKGS_QT6_QML_IMPORT_PATH": "/nix/store/543i31z4bp987xiz1w3dn87ac8x3j4l3-knewstuff-6.26.0/lib/qt-6/qml:/nix/store/59pvrg8hv13a04adgljj7bawxrasi8jv-kcmutils-6.26.0/lib/qt-6/qml:/nix/store/xz3mg2rc43370as028rng8pahd0mhghi-qqc2-desktop-style-6.26.0/lib/qt-6/qml:/nix/store/pfwzgybg1v2vrmrslvgcyrv42ca7gczs-sonnet-6.26.0/lib/qt-6/qml:/nix/store/rsq2qfx4nnqhpvrwhq8y2vf0vbdcpcj4-kirigami-6.26.0/lib/qt-6/qml:/nix/store/ggcpqkdapg0fiy52ns29dh54169bnzz5-kwindowsystem-6.26.0/lib/qt-6/qml:/nix/store/2j9pwmlg4cvz6r9h4vakag329sj9p3m4-knotifications-6.26.0/lib/qt-6/qml:/nix/store/rxr5zrhizd7dqv46wvffzjyr7bf7j36l-kiconthemes-6.26.0/lib/qt-6/qml:/nix/store/50an3g9pf8pij6d8bvnvs8brrvs6h3rz-ki18n-6.26.0/lib/qt-6/qml:/nix/store/2wvgp93k5bjh45dzh816dbg6s2jz3kny-kguiaddons-6.26.0/lib/qt-6/qml:/nix/store/0m32kixngjmcxhf75p4fqy63fx9g7x2x-kcoreaddons-6.26.0/lib/qt-6/qml:/nix/store/zccjqqfj4ax1dq82rsfasgda02nxk3hp-kconfig-6.26.0/lib/qt-6/qml:/nix/store/38qga58ag85cjwilld09slf4qnn4q8s5-qtmultimedia-6.11.3/lib/qt-6/qml:/nix/store/zqycw7kxz2w75310j5f5h54vbkr815j2-qtquick3d-6.11.3/lib/qt-6/qml:/nix/store/93vh2vbn2v66zdr68bazdwr19jy8a7wb-qt5compat-6.11.3/lib/qt-6/qml:/nix/store/j7qrvgg3mprhw8nyi2z1dl5p62g92pja-qtdeclarative-6.11.3/lib/qt-6/qml:/nix/store/ff4srbj887v7sill6f1h2rwjdqigwl6d-plasma-workspace-6.6.6/lib/qt-6/qml:/nix/store/m94lm3cs7k3g868cvvaiw42kw65fxy21-qtvirtualkeyboard-6.11.3/lib/qt-6/qml:/nix/store/hd245w900rbg3pbx09j6s2jzd6l1fh2g-prison-6.26.0/lib/qt-6/qml:/nix/store/zr2afspwwcmpqaq1kvvr3mamrvs6zych-plasma-nano-6.6.6/lib/qt-6/qml:/nix/store/phxg1bcs1gajqbywqm0d2x0ak46n3yb4-kwin-6.6.6/lib/qt-6/qml:/nix/store/gxrbq2bymqdzd8hcxizfidi1mg5y0dz1-milou-6.6.6/lib/qt-6/qml:/nix/store/zjkq1xjhm3kzgl840gz89yviwsh2lz1n-kpipewire-6.6.6/lib/qt-6/qml:/nix/store/rgff3rrfw9x56knwwxnv1mzz2jv734dg-aurorae-6.6.6/lib/qt-6/qml:/nix/store/2md6b72q62l369jmkgc4wrvl0h53pwll-kuserfeedback-6.26.0/lib/qt-6/qml:/nix/store/9zlaidg6zsq3paxff8d4sviar8i9lrqr-libplasma-6.6.6/lib/qt-6/qml:/nix/store/fn8sxn2c4d6crwixfpwsq0qkb3m67p07-layer-shell-qt-6.6.6/lib/qt-6/qml:/nix/store/g091mn5v8a24yvkc93x7xnr1yn5nb801-ksvg-6.26.0/lib/qt-6/qml:/nix/store/vf9yd9avq1cr47n67gcdwqprjixlnlkz-kirigami-addons-1.12.1/lib/qt-6/qml:/nix/store/bcfk3bgchlx0pnl40wxyzap7dv9ra8k0-syntax-highlighting-6.26.0/lib/qt-6/qml:/nix/store/1wz6rp12dn8jy9dlrhs8i4jwndhxid2v-kdeclarative-6.26.0/lib/qt-6/qml:/nix/store/smzr5kspawfys7a05gy1xzvjr0g6zif9-baloo-6.26.0/lib/qt-6/qml:/nix/store/0s9f0kgw701aangzhbch1y1j9x5axz7l-qqc2-breeze-style-6.6.6/lib/qt-6/qml:/nix/store/cslv37zbrj8hgr2fqfx8shmjzya9lrhk-plasma5support-6.6.6/lib/qt-6/qml:/nix/store/w5pgb6qxcsi0h9gix4jjcnywfmmlkqwk-plasma-activities-6.6.6/lib/qt-6/qml:/nix/store/fvyr44qpiryxjb1waaxxbpvyfygkwxmd-networkmanager-qt-6.26.0/lib/qt-6/qml:/nix/store/74blbc20gm580c5h52k2jbgfd4mx2g91-libksysguard-6.6.6/lib/qt-6/qml:/nix/store/a6dp0l84gdw26rz9akiawhr5m2ykqls3-kquickcharts-6.26.0/lib/qt-6/qml:/nix/store/glxmb3g6bcgln1bbkzvg13br1c0fjsg7-kitemmodels-6.26.0/lib/qt-6/qml:/nix/store/bya43yv607gv6fzin1sp43gp4j6k003h-kholidays-6.26.0/lib/qt-6/qml:/nix/store/p68z9ij4x080cz6ilq6rdhq8pmc2z3as-qtwayland-6.11.3/lib/qt-6/qml:/nix/store/hgm52f69ls5xb7k7v73bjqjx88hdxlqd-qtlocation-6.11.3/lib/qt-6/qml:/nix/store/qj0dbv12vqanndr4vh50jz8k4sd4xwa6-qtpositioning-6.11.3/lib/qt-6/qml",
-#    "NIX_BINTOOLS_WRAPPER_TARGET_HOST_x86_64_unknown_linux_gnu": "1",
-#    "NIX_CC_WRAPPER_TARGET_HOST_x86_64_unknown_linux_gnu": "1",
-#    "NIX_CFLAGS_COMPILE": "-idirafter /usr/include",
-#    "NIX_CFLAGS_LINK": "-L/usr/lib -L/usr/lib32",
-#    "NIX_LDFLAGS": "-L/usr/lib -L/usr/lib32",
-#    "NIX_PATH": "nixpkgs=flake:nixpkgs:/nix/var/nix/profiles/per-user/root/channels",
-#    "NIX_PROFILES": "/run/current-system/sw /nix/var/nix/profiles/default /etc/profiles/per-user/michael /home/michael/.local/state/nix/profile /nix/profile /home/michael/.nix-profile",
-#    "NIX_USER_PROFILE_DIR": "/nix/var/nix/profiles/per-user/michael",
-#    "NIX_XDG_DESKTOP_PORTAL_DIR": "/run/current-system/sw/share/xdg-desktop-portal/portals",
-#    "PAGER": "less",
-#    "PAM_KWALLET5_LOGIN": "/run/user/1001/kwallet5.socket",
-#    "PATH": "/run/wrappers/bin:/usr/bin:/usr/sbin:/run/wrappers/bin:/home/michael/.nix-profile/bin:/nix/profile/bin:/home/michael/.local/state/nix/profile/bin:/etc/profiles/per-user/michael/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin",
-#    "PKG_CONFIG_PATH": "/usr/lib/pkgconfig",
-#    "PROFILEHOME": "",
-#    "PWD": "/home/michael",
-#    "PYSIDE6_OPTION_PYTHON_ENUM": "True",
-#    "QML2_IMPORT_PATH": "/home/michael/.nix-profile/lib/qt-5.15.19/qml:/home/michael/.nix-profile/lib/qt-6/qml:/nix/profile/lib/qt-5.15.19/qml:/nix/profile/lib/qt-6/qml:/home/michael/.local/state/nix/profile/lib/qt-5.15.19/qml:/home/michael/.local/state/nix/profile/lib/qt-6/qml:/etc/profiles/per-user/michael/lib/qt-5.15.19/qml:/etc/profiles/per-user/michael/lib/qt-6/qml:/nix/var/nix/profiles/default/lib/qt-5.15.19/qml:/nix/var/nix/profiles/default/lib/qt-6/qml:/run/current-system/sw/lib/qt-5.15.19/qml:/run/current-system/sw/lib/qt-6/qml",
-#    "QTWEBKIT_PLUGIN_PATH": "/home/michael/.nix-profile/lib/mozilla/plugins/:/nix/profile/lib/mozilla/plugins/:/home/michael/.local/state/nix/profile/lib/mozilla/plugins/:/etc/profiles/per-user/michael/lib/mozilla/plugins/:/nix/var/nix/profiles/default/lib/mozilla/plugins/:/run/current-system/sw/lib/mozilla/plugins/",
-#    "QT_AUTO_SCREEN_SCALE_FACTOR": "1",
-#    "QT_PLUGIN_PATH": "/nix/store/07h65asrk5d9g4fwpch6psyabpgygpnd-konsole-26.04.3/lib/qt-6/plugins:/nix/store/xz3mg2rc43370as028rng8pahd0mhghi-qqc2-desktop-style-6.26.0/lib/qt-6/plugins:/nix/store/pfwzgybg1v2vrmrslvgcyrv42ca7gczs-sonnet-6.26.0/lib/qt-6/plugins:/nix/store/8rlfz9y5lpi1md4md7pk7hy3vkbdjkhc-kio-6.26.0/lib/qt-6/plugins:/nix/store/ggcpqkdapg0fiy52ns29dh54169bnzz5-kwindowsystem-6.26.0/lib/qt-6/plugins:/nix/store/rxr5zrhizd7dqv46wvffzjyr7bf7j36l-kiconthemes-6.26.0/lib/qt-6/plugins:/nix/store/50an3g9pf8pij6d8bvnvs8brrvs6h3rz-ki18n-6.26.0/lib/qt-6/plugins:/nix/store/38qga58ag85cjwilld09slf4qnn4q8s5-qtmultimedia-6.11.3/lib/qt-6/plugins:/nix/store/zqycw7kxz2w75310j5f5h54vbkr815j2-qtquick3d-6.11.3/lib/qt-6/plugins:/nix/store/j7qrvgg3mprhw8nyi2z1dl5p62g92pja-qtdeclarative-6.11.3/lib/qt-6/plugins:/nix/store/yz1g8qr1dxjvgw87sbkgdbajdrhc5ff0-qtsvg-6.11.3/lib/qt-6/plugins:/nix/store/i9kdq3bal1ixzgq1av208jip4vlfpl2v-qtbase-6.11.3/lib/qt-6/plugins:/nix/store/v42k0w5fhw0925w7r03mybhbz7vl9m01-qtbase-6.11.3-only-plugins-qml/lib/qt-6/plugins:/nix/store/ff4srbj887v7sill6f1h2rwjdqigwl6d-plasma-workspace-6.6.6/lib/qt-6/plugins:/nix/store/m94lm3cs7k3g868cvvaiw42kw65fxy21-qtvirtualkeyboard-6.11.3/lib/qt-6/plugins:/nix/store/phxg1bcs1gajqbywqm0d2x0ak46n3yb4-kwin-6.6.6/lib/qt-6/plugins:/nix/store/gxrbq2bymqdzd8hcxizfidi1mg5y0dz1-milou-6.6.6/lib/qt-6/plugins:/nix/store/qi6rm4dhs3p98pv1vcaray3mbsrwx2dl-breeze-6.6.6/lib/qt-6/plugins:/nix/store/s9ya31v7wpqfvdc7hwjph7vy9krfq9dk-frameworkintegration-6.26.0/lib/qt-6/plugins:/nix/store/rgff3rrfw9x56knwwxnv1mzz2jv734dg-aurorae-6.6.6/lib/qt-6/plugins:/nix/store/53wx9gyqx16zdk4im1fkgk805fl2l6a3-ktexteditor-6.26.0/lib/qt-6/plugins:/nix/store/54yy3nhh544rr707hd6vf9nsirxn4xqc-kscreenlocker-6.6.6/lib/qt-6/plugins:/nix/store/9zlaidg6zsq3paxff8d4sviar8i9lrqr-libplasma-6.6.6/lib/qt-6/plugins:/nix/store/mn0vp3d6gywamq2jmhd87kxhyzm5yjbb-libkscreen-6.6.6/lib/qt-6/plugins:/nix/store/fn8sxn2c4d6crwixfpwsq0qkb3m67p07-layer-shell-qt-6.6.6/lib/qt-6/plugins:/nix/store/vmfxdj7fpygzsiric07q9i619356w55n-kio-extras-26.04.3/lib/qt-6/plugins:/nix/store/y1vk5dxfh3rgbjpsxy9xxgijwhh3sszp-kglobalacceld-6.6.6/lib/qt-6/plugins:/nix/store/zlh4dvi2d9gkccmmb3nb1igwbbgp8sns-kactivitymanagerd-6.6.6/lib/qt-6/plugins:/nix/store/smzr5kspawfys7a05gy1xzvjr0g6zif9-baloo-6.26.0/lib/qt-6/plugins:/nix/store/xp690c33bv7krd0wg1svisqfvrsafd88-kfilemetadata-6.26.0/lib/qt-6/plugins:/nix/store/0s9f0kgw701aangzhbch1y1j9x5axz7l-qqc2-breeze-style-6.6.6/lib/qt-6/plugins:/nix/store/cslv37zbrj8hgr2fqfx8shmjzya9lrhk-plasma5support-6.6.6/lib/qt-6/plugins:/nix/store/74blbc20gm580c5h52k2jbgfd4mx2g91-libksysguard-6.6.6/lib/qt-6/plugins:/nix/store/xpq4axsvji6l1i6izyhifh7a3yrf4ngs-kauth-6.26.0/lib/qt-6/plugins:/nix/store/k2bdgr9154c6pifsghxssip8dnqfs9vc-kidletime-6.26.0/lib/qt-6/plugins:/nix/store/p68z9ij4x080cz6ilq6rdhq8pmc2z3as-qtwayland-6.11.3/lib/qt-6/plugins:/nix/store/hgm52f69ls5xb7k7v73bjqjx88hdxlqd-qtlocation-6.11.3/lib/qt-6/plugins:/nix/store/qj0dbv12vqanndr4vh50jz8k4sd4xwa6-qtpositioning-6.11.3/lib/qt-6/plugins:/home/michael/.nix-profile/lib/qt-5.15.19/plugins:/home/michael/.nix-profile/lib/qt-6/plugins:/nix/profile/lib/qt-5.15.19/plugins:/nix/profile/lib/qt-6/plugins:/home/michael/.local/state/nix/profile/lib/qt-5.15.19/plugins:/home/michael/.local/state/nix/profile/lib/qt-6/plugins:/etc/profiles/per-user/michael/lib/qt-5.15.19/plugins:/etc/profiles/per-user/michael/lib/qt-6/plugins:/nix/var/nix/profiles/default/lib/qt-5.15.19/plugins:/nix/var/nix/profiles/default/lib/qt-6/plugins:/run/current-system/sw/lib/qt-5.15.19/plugins:/run/current-system/sw/lib/qt-6/plugins",
-#    "QT_WAYLAND_RECONNECT": "1",
-#    "SESSION_MANAGER": "local/lenovo:@/tmp/.ICE-unix/2653,unix/lenovo:/tmp/.ICE-unix/2653",
-#    "SHELL": "/run/current-system/sw/bin/bash",
-#    "SHELL_SESSION_ID": "f36fc320e8c54975814db0c8a2d63649",
-#    "SHLVL": "2",
-#    "SSH_ASKPASS": "/nix/store/55sjhb1cv2hc05g2gifml2qy8akm3rg7-ksshaskpass-6.6.6/bin/ksshaskpass",
-#    "SSL_CERT_FILE": "/data/share/tools/AYON-1.6.3-linux-rocky9/dependencies/certifi/cacert.pem",
-#    "STUDIO_SW": "/mnt/REPO_SW",
-#    "SYSTEMD_EXEC_PID": "2689",
-#    "SYSTEMD_XKB_DIRECTORY": "/etc/X11/xkb",
-#    "TERM": "linux",
-#    "TERMINFO_DIRS": "/home/michael/.nix-profile/share/terminfo:/nix/profile/share/terminfo:/home/michael/.local/state/nix/profile/share/terminfo:/etc/profiles/per-user/michael/share/terminfo:/nix/var/nix/profiles/default/share/terminfo:/run/current-system/sw/share/terminfo",
-#    "TZDIR": "/etc/zoneinfo",
-#    "USER": "michael",
-#    "USE_AYON_SERVER": "1",
-#    "VISUAL": "hx",
-#    "WAYLAND_DISPLAY": "wayland-0",
-#    "WINDOWID": "102938324348800",
-#    "XAUTHORITY": "/run/user/1001/xauth_lCRjgz",
-#    "XCURSOR_PATH": "~/.local/share/icons:~/.icons:/nix/store/ff4srbj887v7sill6f1h2rwjdqigwl6d-plasma-workspace-6.6.6/share/icons:/home/michael/.icons:/home/michael/.local/share/icons:/home/michael/.nix-profile/share/icons:/home/michael/.nix-profile/share/pixmaps:/nix/profile/share/icons:/nix/profile/share/pixmaps:/home/michael/.local/state/nix/profile/share/icons:/home/michael/.local/state/nix/profile/share/pixmaps:/etc/profiles/per-user/michael/share/icons:/etc/profiles/per-user/michael/share/pixmaps:/nix/var/nix/profiles/default/share/icons:/nix/var/nix/profiles/default/share/pixmaps:/run/current-system/sw/share/icons:/run/current-system/sw/share/pixmaps:/usr/share/icons:/usr/share/pixmaps:/usr/X11R6/lib/X11/icons",
-#    "XDG_BIN_HOME": "/home/michael/.local/bin",
-#    "XDG_CACHE_HOME": "/home/michael/.cache",
-#    "XDG_CALIBRE_DIR": "/home/michael/Calibre",
-#    "XDG_CONFIG_DIRS": "/nix/store/ff4srbj887v7sill6f1h2rwjdqigwl6d-plasma-workspace-6.6.6/etc/xdg:/nix/store/y1vk5dxfh3rgbjpsxy9xxgijwhh3sszp-kglobalacceld-6.6.6/etc/xdg:/nix/store/smzr5kspawfys7a05gy1xzvjr0g6zif9-baloo-6.26.0/etc/xdg:/home/michael/.config/kdedefaults:/home/michael/.config/kdedefaults:/etc/xdg:/home/michael/.nix-profile/etc/xdg:/nix/profile/etc/xdg:/home/michael/.local/state/nix/profile/etc/xdg:/etc/profiles/per-user/michael/etc/xdg:/nix/var/nix/profiles/default/etc/xdg:/run/current-system/sw/etc/xdg",
-#    "XDG_CONFIG_HOME": "/home/michael/.config",
-#    "XDG_CURRENT_DESKTOP": "KDE",
-#    "XDG_DATA_DIRS": "/nix/store/07h65asrk5d9g4fwpch6psyabpgygpnd-konsole-26.04.3/share:/nix/store/z6djz7r5drwl952y42y4qfx69lxk6hac-kpty-6.26.0/share:/nix/store/gax1yd3qc07936bkjf24ql7zh318yixh-kparts-6.26.0/share:/nix/store/l9i2d397m9ljcxk60n1vfjbqaxayzi94-knotifyconfig-6.26.0/share:/nix/store/543i31z4bp987xiz1w3dn87ac8x3j4l3-knewstuff-6.26.0/share:/nix/store/59pvrg8hv13a04adgljj7bawxrasi8jv-kcmutils-6.26.0/share:/nix/store/x131rdh28q75hn5g8isqiwyxn0a8ab3n-kxmlgui-6.26.0/share:/nix/store/a7nv3swlxsb560x512hajbi0if5z5dv2-ktextwidgets-6.26.0/share:/nix/store/n2bx7jhnc25vjhibycvai7x05d1x6rik-kpackage-6.26.0/share:/nix/store/xz3mg2rc43370as028rng8pahd0mhghi-qqc2-desktop-style-6.26.0/share:/nix/store/pfwzgybg1v2vrmrslvgcyrv42ca7gczs-sonnet-6.26.0/share:/nix/store/rsq2qfx4nnqhpvrwhq8y2vf0vbdcpcj4-kirigami-6.26.0/share:/nix/store/8rlfz9y5lpi1md4md7pk7hy3vkbdjkhc-kio-6.26.0/share:/nix/store/fxhy3pxd422d7c412aw03fsx3qib1n90-solid-6.26.0/share:/nix/store/a40hf980n8wln87yrfqjj4849s86gzyv-kwallet-6.26.0/share:/nix/store/ggcpqkdapg0fiy52ns29dh54169bnzz5-kwindowsystem-6.26.0/share:/nix/store/j7dnwwky6bj27q2n54blyy27zl5n8x3z-kservice-6.26.0/share:/nix/store/balx5gar6jvyb1yzj7p9fgkwi7qa0an4-kjobwidgets-6.26.0/share:/nix/store/2j9pwmlg4cvz6r9h4vakag329sj9p3m4-knotifications-6.26.0/share:/nix/store/gz847vvnlld5njji14vxzhf0m9c30gsy-kitemviews-6.26.0/share:/nix/store/6pyvyf57wqbl50aph67x2w46j4wzxdar-kcompletion-6.26.0/share:/nix/store/rxr5zrhizd7dqv46wvffzjyr7bf7j36l-kiconthemes-6.26.0/share:/nix/store/vvbmyyhqqhfb2mdccgx42djz8nzrzsp0-breeze-icons-6.26.0/share:/nix/store/6qyz6svnp45hriqcpk70g89xrpkysg08-kglobalaccel-6.26.0/share:/nix/store/wqnr2pfplpw66dcj5r2s2p5y2c7imhgg-kdoctools-6.26.0/share:/nix/store/0m5b815wl57y5slz56vxdhxli6nqmca0-karchive-6.26.0/share:/nix/store/zjvmbjbryj8ggisrzh358grvk5p5il1a-kdbusaddons-6.26.0/share:/nix/store/b90z6lzlj3lwdgphd2q8vkh0cqm92rdl-kconfigwidgets-6.26.0/share:/nix/store/jhcfcy1id6nhxp1pqsf066pkih7cyc5m-kcolorscheme-6.26.0/share:/nix/store/50an3g9pf8pij6d8bvnvs8brrvs6h3rz-ki18n-6.26.0/share:/nix/store/i9qmi9kfjxlbq36i84prw5ybx2gfjbp5-kcodecs-6.26.0/share:/nix/store/39wzhfqa9vjzma3g8h7kk6rcbra687qv-kbookmarks-6.26.0/share:/nix/store/f23dca9giygcmsizh566n01fiqr6r84r-kwidgetsaddons-6.26.0/share:/nix/store/0m32kixngjmcxhf75p4fqy63fx9g7x2x-kcoreaddons-6.26.0/share:/nix/store/zccjqqfj4ax1dq82rsfasgda02nxk3hp-kconfig-6.26.0/share:/nix/store/dc57n41fvvm206bz76zb5rfv0lvka2hg-gst-plugins-good-1.26.11/share:/nix/store/msr3la4xzi1b8n19y30cbnngrr45dczx-gst-plugins-base-1.26.11/share:/nix/store/whdvd5xjwq7p622lyddpxl6ihb9xvzcw-gst-plugins-bad-1.26.11/share:/nix/store/ph5pqgya746266lxy0gai00dxwmp5qgw-gstreamer-1.26.11/share:/nix/store/r7j3zrkk8nlqqb5cp9l5912b91j2q56n-cups-2.4.19/share:/nix/store/px7gba5k8yk2lp22056ql5m5bgyjgwna-cups-2.4.19-lib/share:/nix/store/caxgjf5gbb0b28gd3cfzyq17g6h4cvwd-fontconfig-2.17.1-lib/share:/nix/store/xhzpw4x54fjbd3qvxpljdgm5yiaz4w8b-util-linux-2.42.4-lib/share:/nix/store/c07lnqjmlanqigp5g007i561n0gmb95l-systemd-260.5/share:/nix/store/37zwxk2vpby34jj40in6ia1i5566zca9-glib-2.88.3/share:/nix/store/9r43c08l5j2kj003gvsh2msnhxm9c1kk-gettext-1.0/share:/nix/store/ff4srbj887v7sill6f1h2rwjdqigwl6d-plasma-workspace-6.6.6/share:/nix/store/5nvqy90pqp38pggqd0njj50f62xadnx5-hunspell-1.7.2/share:/nix/store/zr2afspwwcmpqaq1kvvr3mamrvs6zych-plasma-nano-6.6.6/share:/nix/store/phxg1bcs1gajqbywqm0d2x0ak46n3yb4-kwin-6.6.6/share:/nix/store/gxrbq2bymqdzd8hcxizfidi1mg5y0dz1-milou-6.6.6/share:/nix/store/zjkq1xjhm3kzgl840gz89yviwsh2lz1n-kpipewire-6.6.6/share:/nix/store/qi6rm4dhs3p98pv1vcaray3mbsrwx2dl-breeze-6.6.6/share:/nix/store/s9ya31v7wpqfvdc7hwjph7vy9krfq9dk-frameworkintegration-6.26.0/share:/nix/store/mfjlv7xc1qcgc4g17l8b8rnkid6wxfvh-oxygen-icons-6.2.0/share:/nix/store/rgff3rrfw9x56knwwxnv1mzz2jv734dg-aurorae-6.6.6/share:/nix/store/4jk7qkblavn0g9385hhhrb87mpxp6x1b-kdecoration-6.6.6/share:/nix/store/2md6b72q62l369jmkgc4wrvl0h53pwll-kuserfeedback-6.26.0/share:/nix/store/53wx9gyqx16zdk4im1fkgk805fl2l6a3-ktexteditor-6.26.0/share:/nix/store/cxndnfz4ic9jxa2j9lqfan6rrcmfyycj-kstatusnotifieritem-6.26.0/share:/nix/store/54yy3nhh544rr707hd6vf9nsirxn4xqc-kscreenlocker-6.6.6/share:/nix/store/9zlaidg6zsq3paxff8d4sviar8i9lrqr-libplasma-6.6.6/share:/nix/store/mn0vp3d6gywamq2jmhd87kxhyzm5yjbb-libkscreen-6.6.6/share:/nix/store/vf9yd9avq1cr47n67gcdwqprjixlnlkz-kirigami-addons-1.12.1/share:/nix/store/vmfxdj7fpygzsiric07q9i619356w55n-kio-extras-26.04.3/share:/nix/store/bcfk3bgchlx0pnl40wxyzap7dv9ra8k0-syntax-highlighting-6.26.0/share:/nix/store/8npwa9bf8mfva4fx6rc5rkvrrg588b7y-kdnssd-6.26.0/share:/nix/store/1wz6rp12dn8jy9dlrhs8i4jwndhxid2v-kdeclarative-6.26.0/share:/nix/store/zlh4dvi2d9gkccmmb3nb1igwbbgp8sns-kactivitymanagerd-6.6.6/share:/nix/store/smzr5kspawfys7a05gy1xzvjr0g6zif9-baloo-6.26.0/share:/nix/store/xp690c33bv7krd0wg1svisqfvrsafd88-kfilemetadata-6.26.0/share:/nix/store/9br0r2ha5l05vgz0vprx5x6qk95wb1xi-libidn2-2.3.8/share:/nix/store/nryqp6q8yybra8d5fr3wi96njb8kvnlk-appstream-qt-1.1.2/share:/nix/store/lprrnpjp6l6iiv1x85g8527m3s8qk0wv-pipewire-1.6.6/share:/nix/store/k421xfma4g5758wz4fl66km36qn60ipf-libqalculate-5.10.0/share:/nix/store/cslv37zbrj8hgr2fqfx8shmjzya9lrhk-plasma5support-6.6.6/share:/nix/store/xladwfasc7f3vdivlbr0r7kk8cbgqpsq-networkmanager-1.56.0/share:/nix/store/0sw1jaci54y8yk4v2czxavp7q2qmd39s-gnutls-3.8.13/share:/nix/store/74blbc20gm580c5h52k2jbgfd4mx2g91-libksysguard-6.6.6/share:/nix/store/xpq4axsvji6l1i6izyhifh7a3yrf4ngs-kauth-6.26.0/share:/nix/store/12i1hcp7hfnxz42j0if9w12g1401b59q-kunitconversion-6.26.0/share:/nix/store/bya43yv607gv6fzin1sp43gp4j6k003h-kholidays-6.26.0/share:/nix/store/qp2fshaggs6jzgb4hvzkd43p8pqamkc6-desktops/share:/home/michael/.nix-profile/share:/nix/profile/share:/home/michael/.local/state/nix/profile/share:/etc/profiles/per-user/michael/share:/nix/var/nix/profiles/default/share:/run/current-system/sw/share:/run/opengl-driver/share:/run/opengl-driver-32/share:/usr/local/share:/usr/share",
-#    "XDG_DATA_HOME": "/home/michael/.local/share",
-#    "XDG_DESKTOP_DIR": "/home/michael/Desktop",
-#    "XDG_DOCUMENTS_DIR": "/home/michael/Documents",
-#    "XDG_DOWNLOAD_DIR": "/home/michael/Downloads",
-#    "XDG_GIT_DIR": "/home/michael/git",
-#    "XDG_GIT_REPOS_DIR": "/home/michael/git/repos",
-#    "XDG_GPODDER_DIR": "/home/michael/gPodder",
-#    "XDG_KDRIVE_DIR": "/home/michael/kDrive",
-#    "XDG_LOGSEQ_DIR": "/home/michael/Notes/Logseq",
-#    "XDG_MENU_PREFIX": "plasma-",
-#    "XDG_MUSIC_DIR": "/home/michael/Music",
-#    "XDG_OBSIDIAN_DIR": "/home/michael/Notes/Obsidian",
-#    "XDG_PICTURES_DIR": "/home/michael/Pictures",
-#    "XDG_PROJECTS_DIR": "/home/michael/Projects",
-#    "XDG_PUBLICSHARE_DIR": "/home/michael/Public",
-#    "XDG_RUNTIME_DIR": "/run/user/1001",
-#    "XDG_SCREENCASTS_DIR": "/home/michael/Videos/Screencasts",
-#    "XDG_SCREENSHOTS_DIR": "/home/michael/Pictures/Screenshots",
-#    "XDG_SEAT": "seat0",
-#    "XDG_SEAT_PATH": "/org/freedesktop/DisplayManager/Seat0",
-#    "XDG_SESSION_CLASS": "user",
-#    "XDG_SESSION_DESKTOP": "KDE",
-#    "XDG_SESSION_ID": "2",
-#    "XDG_SESSION_PATH": "/org/freedesktop/DisplayManager/Session1",
-#    "XDG_SESSION_TYPE": "wayland",
-#    "XDG_SILVERFAST_DIR": "/home/michael/Pictures/Silverfast",
-#    "XDG_STATE_HOME": "/home/michael/.local/state",
-#    "XDG_TEMPLATES_DIR": "/home/michael/Templates",
-#    "XDG_TEMP_DIR": "/home/michael/.temp",
-#    "XDG_VENV_DIR": "/home/michael/git/venv",
-#    "XDG_VIDEOS_DIR": "/home/michael/Videos",
-#    "XDG_VIRTUAL_MACHINES_QEMU_DIR": "/home/michael/Virtual Machines/qemu",
-#    "XDG_VIRTUAL_MACHINES_ROOT_DIR": "/home/michael/Virtual Machines",
-#    "XDG_VIRTUAL_MACHINES_VIRTUALBOX_DIR": "/home/michael/Virtual Machines/VirtualBox",
-#    "XDG_VIRTUAL_MACHINES_VMWARE_DIR": "/home/michael/Virtual Machines/VMWare",
-#    "XDG_VTNR": "2",
-#    "XDG_WALLPAPERS_DIR": "/home/michael/Pictures/Wallpapers",
-#    "XKB_DEFAULT_LAYOUT": "us",
-#    "XKB_DEFAULT_MODEL": "pc104",
-#    "XKB_DEFAULT_OPTIONS": "terminate:ctrl_alt_bksp",
-#    "_": "/data/share/tools/AYON-1.6.3-linux-rocky9/ayon",
-#    "_JAVA_AWT_WM_NONREPARENTING": "1",
-#    "__ETC_PROFILE_DONE": "1",
-#    "__HM_SESS_VARS_SOURCED": "1",
-#    "__NIXOS_SET_ENVIRONMENT_DONE": "1",
-#    "PYTHONPATH": "/data/share/tools/AYON-deps/addons/blender_1.1.9/ayon_blender/blender_addon:/data/share/tools/AYON-deps/addons/core_1.9.12/ayon_core/vendor/python:/data/share/tools/AYON-1.6.3-linux-rocky9/common:/data/share/tools/AYON-1.6.3-linux-rocky9/dependencies:/data/share/tools/AYON-deps/addons/aftereffects_0.3.7:/data/share/tools/AYON-deps/addons/applications_1.4.6:/data/share/tools/AYON-deps/addons/ayon_ocio_1.2.2:/data/share/tools/AYON-deps/addons/ayon_third_party_1.4.0:/data/share/tools/AYON-deps/addons/blender_1.1.9:/data/share/tools/AYON-deps/addons/celaction_0.2.5:/data/share/tools/AYON-deps/addons/cinema4d_0.2.0:/data/share/tools/AYON-deps/addons/clockify_0.2.2:/data/share/tools/AYON-deps/addons/core_1.9.12:/data/share/tools/AYON-deps/addons/deadline_0.7.3:/data/share/tools/AYON-deps/addons/equalizer_0.2.1:/data/share/tools/AYON-deps/addons/flame_1.4.3:/data/share/tools/AYON-deps/addons/fusion_0.4.2:/data/share/tools/AYON-deps/addons/harmony_0.5.4:/data/share/tools/AYON-deps/addons/hiero_0.6.3:/data/share/tools/AYON-deps/addons/houdini_0.10.7:/data/share/tools/AYON-deps/addons/kitsu_1.2.7:/data/share/tools/AYON-deps/addons/marvelous_designer_1.1.3:/data/share/tools/AYON-deps/addons/max_0.5.1:/data/share/tools/AYON-deps/addons/maya_0.6.12:/data/share/tools/AYON-deps/addons/mocha_1.1.0:/data/share/tools/AYON-deps/addons/motionbuilder_0.2.1:/data/share/tools/AYON-deps/addons/nuke_0.4.15:/data/share/tools/AYON-deps/addons/openrv_1.2.3:/data/share/tools/AYON-deps/addons/photoshop_0.4.7:/data/share/tools/AYON-deps/addons/premiere_0.2.3:/data/share/tools/AYON-deps/addons/resolve_0.6.3:/data/share/tools/AYON-deps/addons/silhouette_0.2.2:/data/share/tools/AYON-deps/addons/sitesync_1.3.2:/data/share/tools/AYON-deps/addons/slack_1.3.1:/data/share/tools/AYON-deps/addons/substancedesigner_0.2.1:/data/share/tools/AYON-deps/addons/substancepainter_0.3.6:/data/share/tools/AYON-deps/addons/timers_manager_0.2.0:/data/share/tools/AYON-deps/addons/traypublisher_0.4.5:/data/share/tools/AYON-deps/addons/tvpaint_0.4.3:/data/share/tools/AYON-deps/addons/unreal_0.4.0:/data/share/tools/AYON-deps/addons/zbrush_0.4.1:/data/share/tools/AYON-deps/dependency_packages/ayon_2609041250_linux-rocky9.zip/dependencies",
-#    "AYON_PROJECT_NAME": "MovieNight",
-#    "AYON_WEBACTION_EVENT_ID": "8c45afd0e6ba11f1a77d86aebf0e9dbd",
-#    "AYON_API_KEY": "871a87fb48efcada7ce3ed880c8c4468994f5456863fc15da609c119819b0673",
-#    "AYON_BUNDLE_NAME": "2026.09.0-2026-10-23-02",
-#    "AYON_STUDIO_BUNDLE_NAME": "2026.09.0-2026-10-23-02",
-#    "BLENDER_USER_SCRIPTS": "/data/share/tools/AYON-deps/addons/blender_1.1.9/ayon_blender/blender_addon",
-#    "AYON_BLENDER_USER_SCRIPTS": "",
-#    "AYON_APP_TOOLS": "",
-#    "AYON_APP_NAME": "blender/4-4-3-alacritty-local",
-#    "AYON_FOLDER_PATH": "/shot",
-#    "AYON_TASK_NAME": "rendering",
-#    "AYON_HOST_NAME": "blender",
-#    "AYON_WORKDIR": "/data/share/projects/ayon/MovieNight/shot/work/rendering",
-#    "AVALON_OPEN_LAST_WORKFILE": "1",
-#    "AYON_WORKFILE_TOOL_ON_START": "0",
-#    "AYON_LAST_WORKFILE": "/data/share/projects/ayon/MovieNight/shot/work/rendering/MoN_shot_rendering_v041_4-4-3.blend"
-#  },
-#  "pid_file": "/tmp/ayon_pid_s44t9ovt.txt",
-#  "stdout": "/tmp/ayon_blender_output_kgz7o_n5.txt",
-#  "stderr": "/tmp/ayon_blender_output_kgz7o_n5.txt"
-#}
-
-
-# Wrapper test
-
-# sleep 30
-
 # https://tecadmin.net/bash-special-variables/
 
 echo "BLENDER_USER_SCRIPTS = $BLENDER_USER_SCRIPTS"
@@ -425,7 +48,7 @@ echo "BLENDER_USER_SCRIPTS = $BLENDER_USER_SCRIPTS"
 # Print all AYON_* environment variables with their values
 printenv | grep '^AYON_'
 
-# We can't use `readlink /data` in the container
+# We can't use 'readlink /data' in the container
 # echo "/data points to: $(readlink /data)"
 
 $(nix eval --raw nixpkgs#pkgs.util-linux)/bin/findmnt --task 1 /mounts/data/sshfs > /dev/null
@@ -439,34 +62,34 @@ fi
 
 # DEFAULT_ARGS="--python-use-system-env --enable-autoexec --verbose 4 --debug --debug-cycles --debug-ffmpeg"
 
-echo "PYTHONPATH = $PYTHONPATH"
+# echo "PYTHONPATH = $PYTHONPATH"
 # PYTHONPATH = /data/share/tools/AYON-deps/addons/blender_1.1.9/ayon_blender/blender_addon:/data/share/tools/AYON-deps/addons/core_1.9.12/ayon_core/vendor/python:/data/share/tools/AYON-1.6.3-linux-rocky9/common:/data/share/tools/AYON-1.6.3-linux-rocky9/dependencies:/data/share/tools/AYON-deps/addons/aftereffects_0.3.7:/data/share/tools/AYON-deps/addons/applications_1.4.6:/data/share/tools/AYON-deps/addons/ayon_ocio_1.2.2:/data/share/tools/AYON-deps/addons/ayon_third_party_1.4.0:/data/share/tools/AYON-deps/addons/blender_1.1.9:/data/share/tools/AYON-deps/addons/celaction_0.2.5:/data/share/tools/AYON-deps/addons/cinema4d_0.2.0:/data/share/tools/AYON-deps/addons/clockify_0.2.2:/data/share/tools/AYON-deps/addons/core_1.9.12:/data/share/tools/AYON-deps/addons/deadline_0.7.3:/data/share/tools/AYON-deps/addons/equalizer_0.2.1:/data/share/tools/AYON-deps/addons/flame_1.4.3:/data/share/tools/AYON-deps/addons/fusion_0.4.2:/data/share/tools/AYON-deps/addons/harmony_0.5.4:/data/share/tools/AYON-deps/addons/hiero_0.6.3:/data/share/tools/AYON-deps/addons/houdini_0.10.7:/data/share/tools/AYON-deps/addons/kitsu_1.2.7:/data/share/tools/AYON-deps/addons/marvelous_designer_1.1.3:/data/share/tools/AYON-deps/addons/max_0.5.1:/data/share/tools/AYON-deps/addons/maya_0.6.12:/data/share/tools/AYON-deps/addons/mocha_1.1.0:/data/share/tools/AYON-deps/addons/motionbuilder_0.2.1:/data/share/tools/AYON-deps/addons/nuke_0.4.15:/data/share/tools/AYON-deps/addons/openrv_1.2.3:/data/share/tools/AYON-deps/addons/photoshop_0.4.7:/data/share/tools/AYON-deps/addons/premiere_0.2.3:/data/share/tools/AYON-deps/addons/resolve_0.6.3:/data/share/tools/AYON-deps/addons/silhouette_0.2.2:/data/share/tools/AYON-deps/addons/sitesync_1.3.2:/data/share/tools/AYON-deps/addons/slack_1.3.1:/data/share/tools/AYON-deps/addons/substancedesigner_0.2.1:/data/share/tools/AYON-deps/addons/substancepainter_0.3.6:/data/share/tools/AYON-deps/addons/timers_manager_0.2.0:/data/share/tools/AYON-deps/addons/traypublisher_0.4.5:/data/share/tools/AYON-deps/addons/tvpaint_0.4.3:/data/share/tools/AYON-deps/addons/unreal_0.4.0:/data/share/tools/AYON-deps/addons/zbrush_0.4.1:/data/share/tools/AYON-deps/dependency_packages/ayon_2609041250_linux-rocky9.zip/dependencies
 
 # Todo
-#  - [ ] try `nohup`
+#  - [ ] try 'nohup'
 #        - https://stackoverflow.com/a/4298179
-#  - [ ] try `disown`
+#  - [ ] try 'disown'
 #        - https://stackoverflow.com/a/4298269
 
 # This works
-# - AYON Process Manager shows `red`
+# - AYON Process Manager shows 'red'
 # - prints weird character to the log
 #   - [K
 # - tmux session gets correctly terminated upon blender close
 # References:
 # - https://superuser.com/a/1080001
-# ```
+# '''
 #echo "Launching flake-prod#blender-4-4-3-app in tmux" \
 #  && echo "..." \
 #  && exec /run/current-system/sw/bin/tmux new -d -s "flake-prod#blender-4-4-3-app" \
 #      "/run/current-system/sw/bin/nix run /home/michael/git/repos/flake-prod#blender-4-4-3-app -- $@" \; pipe-pane "cat > $FD_STDOUT"
-# ```
+# '''
 
 # Works
 # - AYON Process Manager indicates process tree
-# - AYON Process Manager indicates `green`
+# - AYON Process Manager indicates 'green'
 # - does not output from Alacritty to log file
-# ```
+# '''
 #echo "Launching flake-prod#blender-4-4-3-app" \
 #    && echo "..." \
 #    && /run/current-system/sw/bin/alacritty \
@@ -477,68 +100,72 @@ echo "PYTHONPATH = $PYTHONPATH"
 #                run \
 #                /home/michael/git/repos/flake-prod#blender-4-4-3-app \
 #        -- $@
-# ```
+# '''
 
 # Works
-# - AYON Process Manager indicates `red`
+# - AYON Process Manager indicates 'red'
 # - correct blender exit
 #   - Blender quit
-# ```
+# '''
 #echo "Launching flake-prod#blender-4-4-3-app" \
 #  && echo "..." \
 #  && exec /run/current-system/sw/bin/bash -c "nix run /home/michael/git/repos/flake-prod#blender-4-4-3-app -- $@"
-# ```
+# '''
 
 # Works
-# - AYON Process Manager indicates `red`
+# - AYON Process Manager indicates 'red'
 # - correct blender exit
 #   - Blender quit
-# ```
+# '''
 #echo "Launching flake-prod#blender-4-4-3-app" \
 #  && echo "..." \
 #  && exec nix run /home/michael/git/repos/flake-prod#blender-4-4-3-app -- $@
-# ```
+# '''
 
 # Works
-# - AYON Process Manager indicates process tree
-# - AYON Process Manager indicates `green`
-# - correct blender exit
-#   - Blender quit
-#     /home/michael/git/repos/flake-prod/modules/blender/4/4/3/blender: line 510: unexpected EOF while looking for matching ``'
-# - No Alacritty needed
-# - probably the best solution so far
-# ```
-echo "Launching flake-prod#blender-4-4-3-app..." \
-    && nix run /home/michael/git/repos/flake-prod#blender-4-4-3-app -- $@
-# ```
-
-# Works
-# - I don't understand the difference if `nohup` is not provided
+# - I don't understand the difference if 'nohup' is not provided
 #   - nohup: ignoring input
 # - AYON Process Manager indicates process tree
-# - AYON Process Manager indicates `green`
+# - AYON Process Manager indicates 'green'
 # - correct blender exit
 #   - Blender quit
 # - No Alacritty needed
-# ```
+# '''
 #echo "Launching flake-prod#blender-4-4-3-app" \
 #  && echo "..." \
 #  && nohup nix run /home/michael/git/repos/flake-prod#blender-4-4-3-app -- $@
-# ```
+# '''
 
+# Works
+# - AYON Process Manager indicates process tree
+# - AYON Process Manager indicates 'green'
+# - correct blender exit
+#   - Blender quit
+#     /home/michael/git/repos/flake-prod/modules/blender/4/4/3/blender: line 510: unexpected EOF while looking for matching '''
+# - No Alacritty needed
+# - probably the best solution so far
+# - this solution does not seem to like tripple-ticks
+#   - nohup: missing operand
+#     Try 'nohup --help' for more information.
+#     /home/michael/git/repos/flake-prod/modules/blender/4/4/3/blender: line 513: nderstand: command not found
+# - problems with continuously restarting process after blender exit
+# '''
+echo "Launching flake-prod#blender-4-4-3-app..." \
+    && nix run /home/michael/git/repos/flake-prod#blender-4-4-3-app -- $@
+# '''
 
-  # && exec nix run /home/michael/git/repos/flake-prod#blender-4-4-3-app -- $@
-  #
-  # && exec /run/current-system/sw/bin/bash -c "nix run /home/michael/git/repos/flake-prod#blender-4-4-3-package -- $@"
-  #   Seems equal except executable is bash instead of nix.
-  #
-  # && exec /run/current-system/sw/bin/bash -c 'nix run /home/michael/git/repos/flake-prod#blender-4-4-3-package -- $@'
-  # -> blend file does not open (extra args not expanded?)
-  #    - with default args "--python-use-system-env --enable-autoexec --verbose 4 --debug --debug-cycles --debug-ffmpeg"
-  #    - with extra args ""
-  #
-  # && exec /run/current-system/sw/bin/alacritty --hold --command nix run /home/michael/git/repos/flake-prod#blender-4-4-3-package -- $@
-  # -> incomplete log output
-  # && exec nix run /home/michael/git/repos/flake-prod#blender-4-4-3-package -- $@
+# && exec nix run /home/michael/git/repos/flake-prod#blender-4-4-3-app -- $@
+#
+# && exec /run/current-system/sw/bin/bash -c "nix run /home/michael/git/repos/flake-prod#blender-4-4-3-package -- $@"
+#   Seems equal except executable is bash instead of nix.
+#
+# && exec /run/current-system/sw/bin/bash -c 'nix run /home/michael/git/repos/flake-prod#blender-4-4-3-package -- $@'
+# -> blend file does not open (extra args not expanded?)
+#    - with default args "--python-use-system-env --enable-autoexec --verbose 4 --debug --debug-cycles --debug-ffmpeg"
+#    - with extra args ""
+#
+# && exec /run/current-system/sw/bin/alacritty --hold --command nix run /home/michael/git/repos/flake-prod#blender-4-4-3-package -- $@
+# -> incomplete log output
+# && exec nix run /home/michael/git/repos/flake-prod#blender-4-4-3-package -- $@
 
 # /run/current-system/sw/bin/nix
