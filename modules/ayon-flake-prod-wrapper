@@ -1,6 +1,6 @@
 #!/run/current-system/sw/bin/bash
 
-# A wrapper script as main entry point for nix backed blender
+# A wrapper script as main entry point for nix backed DCCs
 # Status: WIP
 
 # echo "This process: $$"
@@ -22,12 +22,19 @@ exec 2>&1
 
 echo $FD_STDOUT
 
+FLAKE="${1}"
+APP="${2}"
+EXTRA_ARGS=${@:3}
+echo "FLAKE = ${FLAKE}"
+echo "APP = ${APP}"
+echo "Extra Args = ${EXTRA_ARGS}"
+
 # Todo:
 #  - [ ] try to redirect like this for virsh to
 #        find out wether the process stays green
 #        based on open file descriptors on /tmp/ayon_blender_*.txt
 
-echo "Process ID (blender wrapper): $$"  # This is the one to keep track of for now (bwrap)
+echo "Process ID (AYON Wrapper): $$"  # This is the one to keep track of for now (bwrap)
 echo "Parent Process ID: $PPID"
 
 # [michael@lenovo djv] (main)$ ls -al /proc/$$/fd/
@@ -43,7 +50,7 @@ env
 
 # https://tecadmin.net/bash-special-variables/
 
-echo "BLENDER_USER_SCRIPTS = $BLENDER_USER_SCRIPTS"
+# echo "BLENDER_USER_SCRIPTS = $BLENDER_USER_SCRIPTS"
 
 # Print all AYON_* environment variables with their values
 printenv | grep '^AYON_'
@@ -150,8 +157,16 @@ fi
 #     /home/michael/git/repos/flake-prod/modules/blender/4/4/3/blender: line 513: nderstand: command not found
 # - problems with continuously restarting process after blender exit
 # '''
-echo "Launching flake-prod#blender-4-4-3-app..." \
-    && nix run /home/michael/git/repos/flake-prod#blender-4-4-3-app -- $@
+
+# FLAKE="/home/michael/git/repos/flake-prod"
+# FLAKE="github:michimussato/flake-prod"
+#APP="${1}"
+
+echo "Updating local checkout of Flake \"${FLAKE}\"..."
+nix flake update --flake "${FLAKE}"
+
+echo "Launching \"${FLAKE}#${APP}\"..." \
+    && nix run "${FLAKE}#${APP}" -- ${EXTRA_ARGS}
 # '''
 
 # && exec nix run /home/michael/git/repos/flake-prod#blender-4-4-3-app -- $@

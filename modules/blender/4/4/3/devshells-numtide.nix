@@ -145,6 +145,10 @@
           && echo "- with extra args \"$@\"" \
           && echo "..." \
           && exec $(which blender) ${builtins.toString blender-default-args} $@
+          # && exec $(which blender) ${builtins.toString blender-default-args} $@
+          # && $(which blender) ${builtins.toString blender-default-args} $@
+          # Works with or without exec; exec will replace bash init with blender, small process tree
+          # Issue with launch loops? Nope; looks fine now.
       '';
 
     blender-default-args = [
