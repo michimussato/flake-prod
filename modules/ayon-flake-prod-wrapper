@@ -168,10 +168,10 @@ echo "Updating local checkout of Flake \"${FLAKE}\"..."
 #       … while updating the lock file of flake 'github:michimussato/flake-prod/cca6f076b61a73464c84f0e0537694c1ddb8e1d8?narHash=sha256-Ym%2BuVviPn0kjJ8wf4Vm2lktvEvCXt8arc7%2BYAdCUhq4%3D'
 #
 #       error: cannot write modified lock file of flake 'github:michimussato/flake-prod' (use '--no-write-lock-file' to ignore)
-# Bug: can be ignored for now:
+# Bug: can be ignored for now - it still seems to update:
 # - https://github.com/NixOS/nix/issues/10342
 # - https://github.com/tweag/nix/blob/cef677ddbcad420220474935b660c147718a3a7c/src/nix/flake.cc#L112
-nix flake update --flake "${FLAKE} --no-write-lock-file"
+nix flake update --flake "${FLAKE}"
 
 echo "Launching \"${FLAKE}#${APP}\"..." \
     && nix run "${FLAKE}#${APP}" -- ${EXTRA_ARGS}
