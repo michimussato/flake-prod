@@ -162,15 +162,9 @@
           && houdini-bin ${builtins.toString houdini-default-args} $@
       '';
 
-      houdini-default-args = [
-        # "--python-use-system-env"
-        # "--enable-autoexec"
-        # "--verbose" # expects a verbosity level
-        # "4"  # fatal, error, warning, info, debug, and trace
-        # "--debug"
-        # "--debug-cycles"
-        # "--debug-ffmpeg"
-      ];
+    houdini-default-args = [
+      "-foreground"
+    ];
 
     in
 
